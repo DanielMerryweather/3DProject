@@ -2,6 +2,7 @@ package com.dcprograming.game.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -15,7 +16,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 public class Core extends ApplicationAdapter {
@@ -41,13 +41,15 @@ public class Core extends ApplicationAdapter {
 	@Override
 	public void create() {
 
-		cam = new PerspectiveCamera(70, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cam = new PerspectiveCamera(110, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		cam.near = 0.1f;
+		cam.far = 50f;
 		cam.translate(0, 1, -3);
 		cam.lookAt(new Vector3(0, 0, 0));
 		cam.update();
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		sphere = mb.createSphere(1f, 1f, 1f, 16, 16, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal | Usage.Position);
-		plane = mb.createBox(10f, 0.1f, 10f, new Material(ColorAttribute.createDiffuse(Color.GRAY)), Usage.Normal | Usage.Position);
+		plane = mb.createBox(3f, 0.1f, 3f, new Material(ColorAttribute.createDiffuse(Color.GRAY)), Usage.Normal | Usage.Position);
 		sph = new ModelInstance(sphere, 0, 2f, 0);
 		pln = new ModelInstance(plane);
 		spheres = new ModelBatch();
@@ -63,6 +65,14 @@ public class Core extends ApplicationAdapter {
 	@Override
 	public void render() {
 
+		if(Gdx.input.isTouched()){
+			Gdx.input.setCursorCatched(true);
+		}
+		
+		if(Gdx.input.isKeyPressed(Keys.ESCAPE)){
+			Gdx.input.setCursorCatched(false);
+		}
+		
 		float dtime = Gdx.graphics.getDeltaTime();
 		
 		sl.begin(Vector3.Zero, cam.direction);
@@ -82,11 +92,12 @@ public class Core extends ApplicationAdapter {
 		}else{
 			y -= 9.81*(dtime/20);
 		}
-		//System.out.println(sph.transform.getTranslation(new Vector3()).y);
 		
-		cam.rotate(Vector3.Y, -0.3f * Gdx.input.getDeltaY());
-		cam.rotate(Vector3.X, 0.3f * Gdx.input.getDeltaY());
-		cam.update();
+		if(Gdx.input.isCursorCatched()){
+			cam.rotate(Vector3.Y, -0.3f * Gdx.input.getDeltaX());
+			cam.rotate(cam.direction.cpy().crs(Vector3.Y), -0.3f * Gdx.input.getDeltaY());
+			cam.update();
+		}
 		
 		spheres.begin(cam);
 		spheres.render(sph, world);
