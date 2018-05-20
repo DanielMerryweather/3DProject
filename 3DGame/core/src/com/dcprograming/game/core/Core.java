@@ -47,16 +47,20 @@ public class Core extends ApplicationAdapter {
 		sphere = mb.createSphere(1f, 1f, 1f, 16, 16, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal | Usage.Position);
 		plane = mb.createBox(3f, 0.1f, 3f, new Material(ColorAttribute.createSpecular(Color.WHITE)), Usage.Normal | Usage.Position);
 		instances.add(new ModelInstance(sphere, 0, 2f, 0));
+		instances.add(new ModelInstance(mb.createRect(20f, 0f, 20f, 20f, 0f, -20f, -20f, 0f, -20f, -20f, 0f, 20f, 0f, 1f, 0f, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal | Usage.Position)));
 		//instances.add(new ModelInstance(plane));
-		for(int x=-5;x<5;x++) {
+		/*for(int x=-5;x<5;x++) {
 			for(int y=-5;y<5;y++) {
 				instances.add(new ModelInstance(plane, x*3f, Math.abs(x*x+y*y)*0.1f, y*3f));
 			}
+		}*/
+		for(int i=0;i<15;i++) {
+			instances.add(new ModelInstance(mb.createBox(2.5f, 2.5f, 2.5f, new Material(ColorAttribute.createDiffuse(Color.LIGHT_GRAY)), Usage.Normal | Usage.Position), (float)(Math.random()*2-1)*20f, 1.25f, (float)(Math.random()*2-1)*20f));
 		}
 		models = new ModelBatch();
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
-		world.add((sl = new DirectionalShadowLight(1024, 1024, 15f, 15f, .1f, 50f)).set(1f, 1f, 1f, new Vector3(-1f,-1f,-1f)));
+		world.add((sl = new DirectionalShadowLight(4096, 4096, 10f, 10f, .1f, 100f)).set(1f, 1f, 1f, new Vector3(-1f,-1f,-1f)));
 		world.shadowMap = sl;
 		
 		coords = mb.createXYZCoordinates(1f, new Material(ColorAttribute.createDiffuse(Color.RED)), Usage.Normal | Usage.Position);
