@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 
 public class Core extends ApplicationAdapter {
 
@@ -26,6 +27,7 @@ public class Core extends ApplicationAdapter {
 	Vector3 boxMotion;
 	ModelInstance realBox2;
 	Vector3 boxMotion2;
+	BoundingBox box2Bounds;
 	Environment world;
 
 	@Override
@@ -47,6 +49,7 @@ public class Core extends ApplicationAdapter {
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
 		world.set(new ColorAttribute(ColorAttribute.Fog, 1f, 1f, 1f, 1));
 		world.add(new DirectionalLight().set(Color.WHITE, new Vector3(1, -1, 1)));
+		box2Bounds = new BoundingBox();
 	}
 
 	@Override
@@ -54,8 +57,12 @@ public class Core extends ApplicationAdapter {
 
 		float dtime = Gdx.graphics.getDeltaTime();
 		boxMotion2.y -= 9.81f / 4;
+		realBox2.calculateBoundingBox(box2Bounds);
+		System.out.println(box2Bounds.getCenterY());
 		realBox.transform.translate(boxMotion.x * dtime, boxMotion.y * dtime, boxMotion.z * dtime);
 		realBox2.transform.translate(boxMotion2.x * dtime, boxMotion2.y * dtime, boxMotion2.z * dtime);
+		realBox.calculateTransforms();
+		realBox2.calculateTransforms();
 
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
