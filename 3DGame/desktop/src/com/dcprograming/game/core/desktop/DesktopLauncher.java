@@ -14,6 +14,5 @@ public class DesktopLauncher {
 		config.resizable = false;
 		Core game = new Core();
 		new LwjglFrame(game, config).addComponentListener(game);
-		;
 	}
 }
