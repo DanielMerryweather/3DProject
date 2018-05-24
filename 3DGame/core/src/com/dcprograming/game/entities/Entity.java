@@ -4,7 +4,7 @@
  * @dateCompleted NOT COMPLETED
  * @version 1.00
  */
-package com.dcprograming.game.core;
+package com.dcprograming.game.entities;
 
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.Model;

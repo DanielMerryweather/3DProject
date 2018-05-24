@@ -1,4 +1,4 @@
-package com.dcprograming.game.core;
+package com.dcprograming.game.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -7,12 +7,12 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Player {
 
-	PerspectiveCamera playerCam;
+	public PerspectiveCamera playerCam;
 
 	int height = 1;
 
 	Quaternion playerRotation;
-	Vector3 playerPosition;
+	public Vector3 playerPosition;
 
 	public Player(float x, float y, float z, float fov, float ilx, float ily, float ilz) {
 

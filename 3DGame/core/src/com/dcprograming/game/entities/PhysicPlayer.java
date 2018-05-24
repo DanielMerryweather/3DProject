@@ -4,7 +4,7 @@
  * @dateCompleted NOT COMPLETED
  * @version 1.00
  */
-package com.dcprograming.game.core;
+package com.dcprograming.game.entities;
 
 import java.util.ArrayList;
 
