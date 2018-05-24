@@ -35,7 +35,7 @@ public class PhysicPlayer extends Player {
 	public void localTranslate(float cx, float cy, float cz, float dt, ArrayList<Entity> instances) {
 
 		if (cy != 0 && ychange == 0)
-			ychange = 5;
+			ychange = 8;
 		cy = ychange;
 		localTranslate(cx, cy, cz, dt);
 		Vector3 max = new Vector3(playerPosition.x + 0.3f, playerPosition.y + height, playerPosition.z + 0.3f);
@@ -49,7 +49,7 @@ public class PhysicPlayer extends Player {
 					ychange = 0;
 			}
 		if (isCollided)
-			localTranslate(-cx, -cy, -cz, dt);
+			localTranslate(-cx * 1.01f, -cy * 1.01f, -cz * 1.01f, dt);
 	}
 
 	public boolean isCollidedBox(BoundingBox box) {

@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 
 public class Core extends ApplicationAdapter implements ComponentListener {
 
@@ -28,6 +29,7 @@ public class Core extends ApplicationAdapter implements ComponentListener {
 	Model plane;
 	Model coords;
 	ArrayList<Entity> instances = new ArrayList<Entity>();
+	ArrayList<btCollisionObject> collisionShapes = new ArrayList<btCollisionObject>();
 	Environment world;
 
 	float grav = -9.81f;
@@ -47,6 +49,7 @@ public class Core extends ApplicationAdapter implements ComponentListener {
 		p = new PhysicPlayer(0, 0.01f, -3, 100, 0, 0, 0);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		sphere = mb.createSphere(1f, 1f, 1f, 16, 16, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal | Usage.Position);
+		collisionShapes.add(new btCollisionObject());
 		plane = mb.createBox(3f, 0.1f, 3f, new Material(ColorAttribute.createSpecular(Color.WHITE)), Usage.Normal | Usage.Position);
 		instances.add(new Entity(sphere, 0, 2f, 0));
 		instances.add(new Entity(
