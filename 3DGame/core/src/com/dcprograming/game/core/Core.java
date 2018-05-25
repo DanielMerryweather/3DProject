@@ -6,15 +6,12 @@
  */
 package com.dcprograming.game.core;
 
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.dcprograming.game.managers.StateManager;
 
-public class Core extends ApplicationAdapter implements ComponentListener {
+public class Core extends ApplicationAdapter {
 
 	private StateManager sm;
 
@@ -28,35 +25,14 @@ public class Core extends ApplicationAdapter implements ComponentListener {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glClearColor(0.9f, 0.9f, 1, 1);
 
-		sm.update(Gdx.graphics.getDeltaTime());
+		float deltaTime = Gdx.graphics.getDeltaTime();
+		if (deltaTime > 1)
+			deltaTime = 0;
+		sm.update(deltaTime);
 		sm.render();
 	}
 
 	public void dispose() {
-
-	}
-
-	@Override
-	public void componentResized(ComponentEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void componentMoved(ComponentEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void componentShown(ComponentEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void componentHidden(ComponentEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 }

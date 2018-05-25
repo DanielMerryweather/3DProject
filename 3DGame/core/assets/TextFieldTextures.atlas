@@ -1,0 +1,20 @@
+
+TextFieldTextures.png
+size: 1024,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+Cursor
+  rotate: false
+  xy: 588, 9
+  size: 28, 141
+  orig: 28, 141
+  offset: 0, 0
+  index: -1
+TextField
+  rotate: false
+  xy: 2, 2
+  size: 584, 148
+  orig: 584, 148
+  offset: 0, 0
+  index: -1
