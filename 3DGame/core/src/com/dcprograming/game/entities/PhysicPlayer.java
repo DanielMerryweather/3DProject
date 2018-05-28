@@ -15,7 +15,7 @@ public class PhysicPlayer extends Player {
 
 	BoundingBox bounds;
 	private float ychange;
-
+	
 	/**
 	 * @param x
 	 * @param y
@@ -33,10 +33,6 @@ public class PhysicPlayer extends Player {
 	}
 
 	public void localTranslate(float cx, float cy, float cz, float dt, ArrayList<Entity> instances) {
-
-		if (cy != 0 && ychange == 0)
-			ychange = 8;
-		cy = ychange;
 		localTranslate(cx, cy, cz, dt);
 		Vector3 max = new Vector3(playerPosition.x + 0.3f, playerPosition.y + height, playerPosition.z + 0.3f);
 		Vector3 min = new Vector3(playerPosition.x - 0.3f, playerPosition.y, playerPosition.z - 0.3f);
@@ -45,15 +41,12 @@ public class PhysicPlayer extends Player {
 		for (int i = 1; i < instances.size(); i++)
 			if (isCollidedBox(instances.get(i).bounds)) {
 				isCollided = true;
-				if (i == 1 && ychange != 0)
-					ychange = 0;
 			}
 		if (isCollided)
 			localTranslate(-cx * 1.01f, -cy * 1.01f, -cz * 1.01f, dt);
 	}
 
 	public boolean isCollidedBox(BoundingBox box) {
-
 		return bounds.intersects(box);
 	}
 

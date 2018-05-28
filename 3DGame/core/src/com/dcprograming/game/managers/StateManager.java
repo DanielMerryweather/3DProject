@@ -8,13 +8,14 @@ package com.dcprograming.game.managers;
 
 import com.dcprograming.game.states.GameState;
 import com.dcprograming.game.states.MenuState;
+import com.dcprograming.game.states.NetworkTestingState;
 import com.dcprograming.game.states.State;
 
 public class StateManager {
 
-	public static final int MENU = 1, GAME = 2, GAME_OVER = 3;
+	public static final int MENU = 1, GAME = 2, GAME_OVER = 3, NETWORKTEST = 4;
 
-	private State state;
+	public State state;
 
 	public StateManager(int startingState) {
 
@@ -32,7 +33,14 @@ public class StateManager {
 		case GAME:
 			state = new GameState(this);
 			break;
+		case NETWORKTEST:
+			state = new NetworkTestingState(this, "");
+			break;
 		}
+	}
+	
+	public void setState(State state) {
+		this.state = state;
 	}
 
 	public void update(float deltaTime) {

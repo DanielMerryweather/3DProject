@@ -12,6 +12,8 @@ public class Player {
 	int height = 1;
 
 	Quaternion playerRotation;
+	float pitch = 90;
+	float yaw = 0;
 	public Vector3 playerPosition;
 
 	public Player(float x, float y, float z, float fov, float ilx, float ily, float ilz) {
@@ -31,13 +33,25 @@ public class Player {
 		playerCam.rotate(Vector3.Y, -sens * Gdx.input.getDeltaX());
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
 		playerRotation = playerCam.view.getRotation(new Quaternion());
+		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z)) * (Math.abs(playerCam.up.y)/playerCam.up.y)/Math.PI*180);
+		yaw = (float) (Math.acos(playerCam.up.z/Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z))* (-Math.abs(playerCam.up.x)/playerCam.up.x)/Math.PI*180);
+		if(Float.isNaN(yaw)) {
+			yaw = 0;
+		}
+		
+		if(pitch < 10) {
+			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), sens * Gdx.input.getDeltaY());
+		}
+		if(pitch < 0) {
+			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), (float)pitch*2f);
+		}
 		playerCam.update();
 	}
 
 	public void localTranslate(float cx, float cy, float cz, float dt) {
-		float nx = dt * ((float) Math.sin(-playerRotation.getYaw() / 180 * Math.PI) * -cz + (float) Math.sin((90 - playerRotation.getYaw()) / 180 * Math.PI) * -cx);
-		float ny = dt * (float) Math.cos(-playerRotation.getPitch() / 180 * Math.PI) * cy;
-		float nz = dt * ((float) Math.cos(-playerRotation.getYaw() / 180 * Math.PI) * -cz + (float) Math.cos((90 - playerRotation.getYaw()) / 180 * Math.PI) * -cx);
+		float nx = dt * ((float) Math.sin(-yaw / 180 * Math.PI) * cz + (float) Math.sin((90 - yaw) / 180 * Math.PI) * cx);
+		float ny = dt * cy;
+		float nz = dt * ((float) Math.cos(-yaw / 180 * Math.PI) * cz + (float) Math.cos((90 - yaw) / 180 * Math.PI) * cx);
 		playerCam.translate(nx, ny, nz);
 		playerPosition.add(nx, ny, nz);
 		playerCam.update();

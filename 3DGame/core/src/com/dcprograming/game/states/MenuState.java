@@ -40,7 +40,7 @@ public class MenuState extends State {
 	/**
 	 * @param stateManager
 	 */
-	public MenuState(StateManager stateManager) {
+	public MenuState(final StateManager stateManager) {
 		super(stateManager);
 
 		stage = new Stage();
@@ -61,8 +61,7 @@ public class MenuState extends State {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-
-				stateManager.setState(StateManager.GAME);
+				stateManager.setState(new NetworkTestingState(stateManager, "127.0.0.1"));
 			}
 		});
 		joinButton = new TextButton("Join Game", buttonStyle);
@@ -70,8 +69,7 @@ public class MenuState extends State {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-
-				stateManager.setState(StateManager.GAME);
+				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText()));
 			}
 		});
 		statsButton = new TextButton("Stats", buttonStyle);
