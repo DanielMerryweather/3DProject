@@ -1,33 +1,38 @@
+/**
+ * @author Colton Giesbrecht
+ * @dateCreated May 24, 2018
+ * @dateCompleted NOT COMPLETED
+ * @version 1.00
+ */
 package com.dcprograming.game.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.dcprograming.game.managers.StateManager;
 
 public class Core extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
-	@Override
-	public void create () {
-		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+
+	private StateManager sm;
+
+	public void create() {
+
+		sm = new StateManager(StateManager.MENU);
 	}
 
-	@Override
-	public void render () {
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	public void render() {
+
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glClearColor(0.9f, 0.9f, 1, 1);
+
+		float deltaTime = Gdx.graphics.getDeltaTime();
+		if (deltaTime > 1)
+			deltaTime = 0;
+		sm.update(deltaTime);
+		sm.render();
 	}
-	
-	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
+
+	public void dispose() {
+
 	}
 }
