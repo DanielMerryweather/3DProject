@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
@@ -34,8 +35,6 @@ public class NetworkTestingState extends State {
 	ModelBuilder mb = new ModelBuilder();
 	Environment world;
 	
-	PlayerModel playerModel;
-	
 	DirectionalShadowLight sl;
 	CullingModelBatch sb;
 	
@@ -44,6 +43,8 @@ public class NetworkTestingState extends State {
 	String desiredAddress = "127.0.0.1";
 	
 	Client c;
+	
+	Entity ball;
 	
 	/**
 	 * @param stateManager
@@ -64,22 +65,64 @@ public class NetworkTestingState extends State {
 		c.sendPacket(new Packet("YAW:"+p.yaw));
 		
 		world = new Environment();
-		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f,
+		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
+		world.add((sl = new DirectionalShadowLight(4096, 4096, 45f, 45f, 0f,
 				100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
 		world.shadowMap = sl;
 		entities.add(new Entity(mb.createBox(10, 2, 10, new Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal | Usage.Position), 0,-2,0));
 		sb = new CullingModelBatch(new DepthShaderProvider());
 		
-		playerModel = new PlayerModel(Color.RED, mb);
+		ball = new Entity(mb.createSphere(1f, 1f, 1f, 20, 20, new Material(ColorAttribute.createDiffuse(Color.BROWN)), Usage.Normal | Usage.Position), 0,0,0);
 	}
 
 	@Override
 	public void render() {
 		
+		Entity me = null;
+		ArrayList<Entity> players = new ArrayList<Entity>();
+		for(String plyr : c.pm.data.keySet()){
+			float x = 0;
+			float y = 0;
+			float z = 0;
+			float pitch = 0;
+			float yaw = 0;
+			for(Packet p : c.pm.data.get(plyr)){
+				if(p.getIdentifier().equals("X")){
+					x = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("Y")){
+					y = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("Z")){
+					z = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("PITCH")){
+					pitch = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("YAW")){
+					yaw = Float.parseFloat(p.getData());
+				}
+			}
+			
+			if(plyr.equals("BALL")){
+				ball.transform.setTranslation(x,y,z);
+			}else{
+				PlayerModel otherPlayer = new PlayerModel(Color.BLUE, mb);
+				otherPlayer.model.transform.setFromEulerAnglesRad(-yaw/180f*(float)Math.PI, -pitch/180f*(float)Math.PI, 0);
+				otherPlayer.model.transform.setTranslation(x,y,z);
+				
+				if(plyr.equals(System.getProperty("user.name"))){
+					me = otherPlayer.model;
+				}else{
+					players.add(otherPlayer.model);
+				}
+			}
+		}
+		
 		sl.begin(p.playerPosition, p.playerCam.direction);
 		sb.begin(sl.getCamera());
 		sb.render(entities, world);
-		sb.render(playerModel.model, world); // Render players shadow but don't actually show the personal player model
+		if(me != null){
+			sb.render(me, world);
+		}
+		sb.render(players, world);
+		sb.render(ball, world);
 		sb.end();
 		sl.end();
 		
@@ -87,15 +130,8 @@ public class NetworkTestingState extends State {
 		
 		renderer.begin(p.playerCam);
 		renderer.render(entities, world);
-		for(String plyr : c.pm.data.keySet()){
-			PlayerModel otherPlayer = new PlayerModel(Color.BLUE, mb);
-			for(Packet p : c.pm.data.get(plyr)){
-				if(p.getIdentifier().equals("X")){
-					otherPlayer.model.transform.setTranslation(Float.parseFloat(p.getData()), 0, 0);
-				}
-			}
-			renderer.render(otherPlayer.model, world);
-		}
+		renderer.render(players, world);
+		renderer.render(ball, world);
 		renderer.end();
 	}
 
@@ -124,8 +160,6 @@ public class NetworkTestingState extends State {
 			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 1 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -1 : 0);
 			p.localTranslate(cx, cy, cz, deltaTime*2, entities);
 		}
-		
-		playerModel.model.transform.setToTranslation(p.playerPosition);
 		
 	}
 

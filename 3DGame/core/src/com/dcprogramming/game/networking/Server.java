@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.math.Vector3;
 import com.dcprograming.game.managers.PacketManager;
 
 public class Server {
@@ -23,14 +24,97 @@ public class Server {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Server started on port " + PORT);
+        
         ServerSocket servSocket = new ServerSocket(PORT);
         try {
+
+            new Ball().start();
             while (true) {
                 new Handler(servSocket.accept()).start();
             }
         } finally {
         	servSocket.close();
         }
+    }
+    
+    private static class Ball extends Thread {
+    	
+    	float bx = 0;
+    	float by = 0;
+    	float bz = 0;
+    	
+    	float bxv = 0.05f;
+    	float byv = 0.1f;
+    	float bzv = 0.025f;
+    	
+    	float grav = -9.81f;
+    	
+    	Client c;
+    	
+    	public void run(){
+    		c = new Client();
+    		while(true){
+    			bx += bxv;
+    			by += byv;
+    			bz += bzv;
+    			
+    			if(by < 0){
+    				by = 0;
+    				byv = -byv;
+    			}
+    			
+				byv += grav/1000;
+    			
+    			if(bx < -5){
+    				bx = -5;
+    				bxv = -bxv;
+    			}else if(bx > 5){
+    				bx = 5;
+    				bxv = -bxv;
+    			}
+    			
+    			if(bz < -5){
+    				bz = -5;
+    				bzv = -bzv;
+    			}else if(bz > 5){
+    				bz = 5;
+    				bzv = -bzv;
+    			}
+    			
+    			c.sendPacket(new Packet("X:"+bx));
+    			c.sendPacket(new Packet("Y:"+by));
+    			c.sendPacket(new Packet("Z:"+bz));
+    			
+    			ArrayList<Vector3> players = new ArrayList<Vector3>();
+    			for(String plyr : c.pm.data.keySet()){
+    				
+    				if(plyr.equals("BALL")){
+    					continue;
+    				}
+    				
+    				float x = 0;
+    				float y = 0;
+    				float z = 0;
+    				float pitch = 0;
+    				float yaw = 0;
+    				for(Packet p : c.pm.data.get(plyr)){
+    					if(p.getIdentifier().equals("X")){
+    						x = Float.parseFloat(p.getData());
+    					}else if(p.getIdentifier().equals("Y")){
+    						y = Float.parseFloat(p.getData());
+    					}else if(p.getIdentifier().equals("Z")){
+    						z = Float.parseFloat(p.getData());
+    					}
+    				}
+    				players.add(new Vector3(x,y,z));
+    			}
+    			
+    			try{
+    				Thread.sleep(16);
+    			}catch(Exception e){}
+    		}
+    	}
+    	
     }
 
     private static class Handler extends Thread {

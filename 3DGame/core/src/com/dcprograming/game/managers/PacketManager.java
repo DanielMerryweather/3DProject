@@ -46,13 +46,15 @@ public class PacketManager {
 	
 	public String packageData(){
 		String result = "";
-		for(String s : data.keySet()){
-			result += s + ">";
-			for(Packet p : data.get(s)){
-				result += p.repackage() + ";";
+		try{
+			for(String s : data.keySet()){
+				result += s + ">";
+				for(Packet p : data.get(s)){
+					result += p.repackage() + ";";
+				}
+				result += "/";
 			}
-			result += "/";
-		}
+		}catch(Exception e){};
 		return result;
 	}
 	

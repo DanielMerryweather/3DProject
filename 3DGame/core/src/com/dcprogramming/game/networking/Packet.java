@@ -8,7 +8,12 @@ public class Packet {
 	public Packet(String data) {
 		String[] splitData = data.split(":");
 		this.identifier = splitData[0];
-		this.data = splitData[1];
+		try{
+			this.data = splitData[1];
+		}catch(Exception e){
+			this.data = "";
+			System.out.println(data);
+		}
 	}
 
 	public String getIdentifier() {

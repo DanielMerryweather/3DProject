@@ -61,7 +61,6 @@ public class MenuState extends State {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("WTFFFFFFFFFFFFFFFFFFFFFFF");
 				stateManager.setState(new NetworkTestingState(stateManager, "127.0.0.1"));
 			}
 		});
@@ -70,7 +69,6 @@ public class MenuState extends State {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				System.out.println("WTFFFFFFFFFFFFFFFFFFFFFFF");
 				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText()));
 			}
 		});

@@ -33,8 +33,14 @@ public class Client {
     
 	public Client(String connectableAddress) {
 		this.connectableAddress = connectableAddress;
-		new Connection(this).start();
-		new Retriever(1000, this).start();
+		new Connection(this, System.getProperty("user.name")).start();
+		new Retriever(8, this).start();
+	}
+	
+	public Client() {
+		this.connectableAddress = "127.0.0.1";
+		new Connection(this, "BALL").start();
+		new Retriever(8, this).start();
 	}
 	
 	private static class Retriever extends Thread{
@@ -60,9 +66,11 @@ public class Client {
 	private static class Connection extends Thread {
 		
 		Client c;
+		String name;
 		
-		public Connection(Client c) {
+		public Connection(Client c, String name) {
 			this.c = c;
+			this.name = name;
 	        try {
 				socket = new Socket(connectableAddress, 9001);
 				in = new BufferedReader(new InputStreamReader(
@@ -83,11 +91,13 @@ public class Client {
 				}
 				if(!(line == null)){
 		            if (line.startsWith("USERNAME")) {
-		                //out.println(System.getProperty("user.name"));
-		            	out.println("Daniel");
+		                out.println(name);
+						System.out.print(name);
+		            	//out.println("Daniel");
+		            	//out.println("Colton");
 		            } else if (line.startsWith("USERACCEPTED")) {
 		                successfullyConnected = true;
-		                System.out.print("TEST");
+		                //System.out.print("TEST");
 		            } else if(line != null){
 		            	System.out.println("Packet Recieved: " + line);
 		                pm = new PacketManager(line);
