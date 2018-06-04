@@ -119,6 +119,7 @@ public class MenuState extends State {
 	public void dispose() {
 		// TODO Auto-generated method stub
 		stage.dispose();
+		System.out.println("Hi");
 	}
 
 }

@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+import com.dcprograming.game.managers.PacketManager;
+
 public class Server {
 
     private static final int PORT = 9001;
@@ -17,7 +19,7 @@ public class Server {
 
     private static ArrayList<PrintWriter> userwriters = new ArrayList<PrintWriter>();
     
-    private static ArrayList<String> packets = new ArrayList<String>();
+    private static PacketManager pm = new PacketManager("");
 
     public static void main(String[] args) throws Exception {
         System.out.println("Server started on port " + PORT);
@@ -62,7 +64,7 @@ public class Server {
                     }
                 }
 
-                out.println("USERNAMEACCEPTED");
+                out.println("USERACCEPTED");
                 userwriters.add(out);
 
                 while (true) {
@@ -70,14 +72,15 @@ public class Server {
                     if (input == null) {
                         return;
                     }
+                	//System.out.println(input);
                     if(input.equals("UPDATEREQUEST")) {
-                    	//System.out.println("<updatePacket>");
-                    	out.println("name:data");
+                    	out.println(pm.packageData());
                     	/*for (PrintWriter writer : userwriters) {
                             writer.println("MESSAGE " + name + ": " + input);
                         }*/
-                    }else {
-                    	System.out.println(input);
+                    }else if(!input.equals(name)){
+                    	//System.out.println(input);
+                    	pm.pushPacket(name, new Packet(input));
                     	// Client sent a packet
                     }
                 }
@@ -85,6 +88,7 @@ public class Server {
                 System.out.println(e);
             } finally {
             	System.out.println("NEW DISCONNECTION!");
+            	pm.removeOwner(name);
                 if (name != null) {
                 	usernames.remove(name);
                 }

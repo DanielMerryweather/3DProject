@@ -24,6 +24,8 @@ import com.dcprograming.game.entities.PhysicPlayer;
 import com.dcprograming.game.entities.PlayerModel;
 import com.dcprograming.game.managers.CullingModelBatch;
 import com.dcprograming.game.managers.StateManager;
+import com.dcprogramming.game.networking.Client;
+import com.dcprogramming.game.networking.Packet;
 
 public class NetworkTestingState extends State {
 	
@@ -41,16 +43,25 @@ public class NetworkTestingState extends State {
 	
 	String desiredAddress = "127.0.0.1";
 	
+	Client c;
+	
 	/**
 	 * @param stateManager
 	 */
 	public NetworkTestingState(StateManager stateManager, String address) {
 		super(stateManager);
-
-		desiredAddress = address;
 		
 		renderer = new CullingModelBatch();
 		p = new PhysicPlayer(0,0,0, 110, 0,0,1);
+		
+		desiredAddress = address;
+		System.out.println(address);
+		c = new Client(desiredAddress);
+		c.sendPacket(new Packet("X:"+p.playerPosition.x));
+		c.sendPacket(new Packet("Y:"+p.playerPosition.y));
+		c.sendPacket(new Packet("Z:"+p.playerPosition.z));
+		c.sendPacket(new Packet("PITCH:"+p.pitch));
+		c.sendPacket(new Packet("YAW:"+p.yaw));
 		
 		world = new Environment();
 		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f,
@@ -76,11 +87,41 @@ public class NetworkTestingState extends State {
 		
 		renderer.begin(p.playerCam);
 		renderer.render(entities, world);
+		for(String plyr : c.pm.data.keySet()){
+			PlayerModel otherPlayer = new PlayerModel(Color.BLUE, mb);
+			float x = 0;
+			float y = 0;
+			float z = 0;
+			float pitch = 0;
+			float yaw = 0;
+			for(Packet p : c.pm.data.get(plyr)){
+				if(p.getIdentifier().equals("X")){
+					x = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("Y")){
+					y = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("Z")){
+					z = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("PITCH")){
+					pitch = Float.parseFloat(p.getData());
+				}else if(p.getIdentifier().equals("YAW")){
+					yaw = Float.parseFloat(p.getData());
+				}
+			}
+			otherPlayer.model.transform.setFromEulerAnglesRad(-yaw/180f*(float)Math.PI, -pitch/180f*(float)Math.PI, 0);
+			otherPlayer.model.transform.setTranslation(x,y,z);
+			renderer.render(otherPlayer.model, world);
+		}
 		renderer.end();
 	}
 
 	@Override
 	public void update(float deltaTime) {
+		
+		c.sendPacket(new Packet("X:"+p.playerPosition.x));
+		c.sendPacket(new Packet("Y:"+p.playerPosition.y));
+		c.sendPacket(new Packet("Z:"+p.playerPosition.z));
+		c.sendPacket(new Packet("PITCH:"+p.pitch));
+		c.sendPacket(new Packet("YAW:"+p.yaw));
 		
 		if (Gdx.input.isTouched()) {
 			Gdx.input.setCursorCatched(true);
@@ -106,7 +147,7 @@ public class NetworkTestingState extends State {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-
+		c.disconnect();
 	}
 
 }

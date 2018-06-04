@@ -18,7 +18,6 @@ public class StateManager {
 	public State state;
 
 	public StateManager(int startingState) {
-
 		setState(startingState);
 	}
 
@@ -40,6 +39,8 @@ public class StateManager {
 	}
 	
 	public void setState(State state) {
+		if (this.state != null)
+			this.state.dispose();
 		this.state = state;
 	}
 

@@ -11,9 +11,9 @@ public class Player {
 
 	int height = 1;
 
-	Quaternion playerRotation;
-	float pitch = 90;
-	float yaw = 0;
+	//Quaternion playerRotation;
+	public float pitch = 90;
+	public float yaw = 0;
 	public Vector3 playerPosition;
 
 	public Player(float x, float y, float z, float fov, float ilx, float ily, float ilz) {
@@ -26,13 +26,13 @@ public class Player {
 		playerCam.lookAt(new Vector3(ilx, ily, ilz));
 		playerCam.update();
 
-		playerRotation = playerCam.view.getRotation(new Quaternion());
+		//playerRotation = playerCam.view.getRotation(new Quaternion());
 	}
 
 	public void rotate(float sens) {
 		playerCam.rotate(Vector3.Y, -sens * Gdx.input.getDeltaX());
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
-		playerRotation = playerCam.view.getRotation(new Quaternion());
+		//playerRotation = playerCam.view.getRotation(new Quaternion());
 		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z)) * (Math.abs(playerCam.up.y)/playerCam.up.y)/Math.PI*180);
 		yaw = (float) (Math.acos(playerCam.up.z/Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z))* (-Math.abs(playerCam.up.x)/playerCam.up.x)/Math.PI*180);
 		if(Float.isNaN(yaw)) {
