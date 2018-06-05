@@ -14,6 +14,11 @@ import com.dcprograming.game.managers.StateManager;
 public class Core extends ApplicationAdapter {
 
 	private StateManager sm;
+	public static int pixels;
+
+	public Core(int pixels) {
+		this.pixels = pixels;
+	}
 
 	public void create() {
 

@@ -8,6 +8,7 @@ package com.dcprograming.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -15,23 +16,26 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
+import com.dcprograming.game.core.Core;
+import com.dcprograming.game.managers.SizedTextButton;
 import com.dcprograming.game.managers.SizedTextField;
 import com.dcprograming.game.managers.StateManager;
 
 public class MenuState extends State {
 
-	private TextButton hostButton;
-	private TextButton joinButton;
-	private TextButton quitButton;
-	private TextButton statsButton;
+	private SizedTextButton hostButton;
+	private SizedTextButton joinButton;
+	private SizedTextButton quitButton;
+	private SizedTextButton statsButton;
+	private Image title;
 	private TextField ipTextField;
 	private Stage stage;
 	private Table buttonTable;
@@ -49,31 +53,33 @@ public class MenuState extends State {
 		FreeTypeFontGenerator fontGen = new FreeTypeFontGenerator(Gdx.files.internal("YellowSwamp.ttf"));
 		FreeTypeFontParameter fontParameter = new FreeTypeFontParameter();
 		// fontParameter.color = Color.YELLOW;
-		fontParameter.size = 100;
+		fontParameter.size = (int) (Core.pixels / 2);
 		BitmapFont buttonFont = fontGen.generateFont(fontParameter);
 		TextButtonStyle buttonStyle = new TextButtonStyle(buttonSkin.getDrawable("BroomButtonReg"), buttonSkin.getDrawable("BroomButtonReg"), buttonSkin.getDrawable("BroomButtonReg"), buttonFont);
 		buttonStyle.over = buttonSkin.getDrawable("BroomButtonHover");
 		buttonStyle.overFontColor = Color.WHITE;
 		buttonStyle.fontColor = Color.YELLOW;
 		fontGen.dispose();
-		hostButton = new TextButton("Host Game", buttonStyle);
+		hostButton = new SizedTextButton("Host Game", buttonStyle, Core.pixels * 4, Core.pixels);
 		hostButton.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				stateManager.setState(new NetworkTestingState(stateManager, "127.0.0.1", true));
+
+				stateManager.setState(StateManager.GAME);
 			}
 		});
-		joinButton = new TextButton("Join Game", buttonStyle);
+		joinButton = new SizedTextButton("Join Game", buttonStyle, Core.pixels * 4, Core.pixels);
 		joinButton.addListener(new ChangeListener() {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
+
+				stateManager.setState(StateManager.GAME);
 			}
 		});
-		statsButton = new TextButton("Stats", buttonStyle);
-		quitButton = new TextButton("Quit", buttonStyle);
+		statsButton = new SizedTextButton("Stats", buttonStyle, Core.pixels * 4, Core.pixels);
+		quitButton = new SizedTextButton("Quit", buttonStyle, Core.pixels * 4, Core.pixels);
 		quitButton.addListener(new ChangeListener() {
 
 			@Override
@@ -86,15 +92,17 @@ public class MenuState extends State {
 		Skin textFieldSkin = new Skin(new TextureAtlas("TextFieldTextures.atlas"));
 		TextFieldStyle textFieldStyle = new TextFieldStyle(buttonFont, Color.YELLOW, textFieldSkin.getDrawable("Cursor"), textFieldSkin.getDrawable("TextField"),
 				textFieldSkin.getDrawable("TextField"));
-		ipTextField = new SizedTextField("", textFieldStyle, 548);
+		ipTextField = new SizedTextField("", textFieldStyle, Core.pixels * 4, Core.pixels);
 		ipTextField.setMessageText("IP Address:");
 		ipTextField.setAlignment(Align.center);
 		joinGameGroup = new HorizontalGroup();
 		joinGameGroup.space(10);
 		joinGameGroup.addActor(ipTextField);
 		joinGameGroup.addActor(joinButton);
+		title = new Image(new Texture(Gdx.files.internal("Title.png")));
 		buttonTable = new Table();
 		buttonTable.setFillParent(true);
+		buttonTable.add(title).size(Core.pixels * 8, Core.pixels * 3).pad(40).center().row();
 		buttonTable.add(hostButton).pad(10).center().row();
 		buttonTable.add(joinGameGroup).pad(10).center().row();
 		buttonTable.add(statsButton).pad(10).center().row();
@@ -119,7 +127,6 @@ public class MenuState extends State {
 	public void dispose() {
 		// TODO Auto-generated method stub
 		stage.dispose();
-		System.out.println("Hi");
 	}
 
 }
