@@ -33,11 +33,11 @@ public class StateManager {
 			state = new GameState(this);
 			break;
 		case NETWORKTEST:
-			state = new NetworkTestingState(this, "");
+			state = new NetworkTestingState(this, "", false);
 			break;
 		}
 	}
-	
+
 	public void setState(State state) {
 		if (this.state != null)
 			this.state.dispose();
