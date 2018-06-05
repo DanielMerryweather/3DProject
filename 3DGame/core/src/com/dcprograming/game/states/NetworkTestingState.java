@@ -12,6 +12,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
 import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
@@ -33,33 +34,34 @@ public class NetworkTestingState extends State {
 
 	private static final float ARENA_WIDTH = 10, ARENA_DEPTH = 20, ARENA_HEIGHT = 5;
 
-	CullingModelBatch renderer;
+	Ball ball;
+	Client c;
+	String desiredAddress = "127.0.0.1";
 	ArrayList<Entity> entities = new ArrayList<Entity>();
-	ModelBuilder mb = new ModelBuilder();
-	Environment world;
 
-	PlayerModel playerModel;
-
-	DirectionalShadowLight sl;
-	CullingModelBatch sb;
-
-	PhysicPlayer p;
 	// PlayerModel holdingPlayer;
 	String holdingPlayer = "";
-	Ball ball;
-	BoundingBox otherPlayerBounds;
 
 	boolean launch;
+	ModelBuilder mb = new ModelBuilder();
 
-	String desiredAddress = "127.0.0.1";
+	BoundingBox otherPlayerBounds;
+	PhysicPlayer p;
+	PlayerModel playerModel;
+	CullingModelBatch renderer;
 
-	Client c;
 	Server s;
+
+	CullingModelBatch sb;
+
+	DirectionalShadowLight sl;
+	Environment world;
 
 	/**
 	 * @param stateManager
 	 */
 	public NetworkTestingState(StateManager stateManager, String address, boolean isHost) {
+
 		super(stateManager);
 		desiredAddress = address;
 
@@ -67,8 +69,7 @@ public class NetworkTestingState extends State {
 		p = new PhysicPlayer(-4, 0, 0, 110, 0, 0, 1);
 
 		System.out.println(address);
-		if (isHost)
-			(s = new Server()).start();
+		if (isHost) (s = new Server()).start();
 		;
 		c = new Client(desiredAddress);
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
@@ -83,10 +84,10 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
+			c.sendPacket(new Packet("BallColour:" + ball.colour));
 		}
 		world = new Environment();
-		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f,
-				100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
+		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f, 100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
 		world.shadowMap = sl;
 		entities.add(new Wall(-ARENA_WIDTH / 2, -0.2f, -ARENA_DEPTH / 2, ARENA_WIDTH, 0.2f, ARENA_DEPTH, Color.GREEN));
 		// entities.add(new Entity(mb.createBox(10, 2, 10, new
@@ -97,83 +98,14 @@ public class NetworkTestingState extends State {
 	}
 
 	@Override
-	public void update(float deltaTime) {
+	public void dispose() {
 
-		if (ball != null) {
-			if(launch){
-				ball.x = 0;
-				ball.y = 0;
-				ball.z = 0;
-				launch = false;
-				holdingPlayer = "";
-			}
-			ball.update(deltaTime);
-			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
-			if (ball.x < -ARENA_WIDTH / 2)
-				ball.x = -ARENA_WIDTH / 2;
-			else if (ball.x > ARENA_WIDTH / 2)
-				ball.x = ARENA_WIDTH / 2;
-			if (ball.y < 0)
-				ball.y = 0;
-			else if (ball.y > ARENA_HEIGHT)
-				ball.y = ARENA_HEIGHT;
-			if (ball.z < -ARENA_DEPTH / 2)
-				ball.z = -ARENA_DEPTH / 2;
-			else if (ball.z > ARENA_DEPTH / 2)
-				ball.z = ARENA_DEPTH / 2;
-			
-			c.sendPacket(new Packet("BallX:" + ball.x));
-			c.sendPacket(new Packet("BallY:" + ball.y));
-			c.sendPacket(new Packet("BallZ:" + ball.z));
-		}
-
-		c.sendPacket(new Packet("X:" + p.playerPosition.x));
-		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
-		c.sendPacket(new Packet("Z:" + p.playerPosition.z));
-		c.sendPacket(new Packet("PITCH:" + p.pitch));
-		c.sendPacket(new Packet("YAW:" + p.yaw));
-		c.sendPacket(new Packet("LAUNCH:" + Gdx.input.isTouched()));
-
-		if (Gdx.input.isTouched()) {
-			Gdx.input.setCursorCatched(true);
-		}
-
-		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
-			if (!Gdx.input.isCursorCatched())
-				Gdx.app.exit();
-			else
-				Gdx.input.setCursorCatched(false);
-		}
-
-		if (Gdx.input.isCursorCatched()) {
-			p.rotate(0.3f);
-
-			float cx = (Gdx.input.isKeyPressed(Keys.A) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -2 : 0);
-			float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -1 : 0);
-			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -2 : 0);
-			p.localTranslate(cx, cy, cz, deltaTime);
-		}
-
-		if (p.playerPosition.x < -ARENA_WIDTH / 2)
-			p.setPosition(-ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
-		else if (p.playerPosition.x > ARENA_WIDTH / 2)
-			p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
-		if (p.playerPosition.y < 0)
-			p.setPosition(0, -p.playerPosition.y, 0);
-		else if (p.playerPosition.y > ARENA_HEIGHT)
-			p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
-		if (p.playerPosition.z < -ARENA_DEPTH / 2)
-			p.setPosition(0, 0, -ARENA_DEPTH / 2 - p.playerPosition.z);
-		else if (p.playerPosition.z > ARENA_DEPTH / 2)
-			p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
-
-		// playerModel.model.transform.setFromEulerAngles(-p.playerCam.view.getRotation(new
-		// Quaternion()).getYaw(), -p.playerCam.view.getRotation(new
-		// Quaternion()).getPitch(), 0);
-		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0,1f,0)),
-				new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
-		// playerModel.model.transform.setToTranslation(p.playerPosition);
-		launch = false;
+		// TODO Auto-generated method stub
+		c.disconnect();
+		c = null;
+		s.stop();
+		s = null;
+		System.gc();
 	}
 
 	@Override
@@ -182,7 +114,8 @@ public class NetworkTestingState extends State {
 		sl.begin(p.playerPosition, p.playerCam.direction);
 		sb.begin(sl.getCamera());
 		entities.forEach(e -> e.render(renderer, world));
-		sb.render(playerModel.model, world); // Render players shadow but don't actually show the personal player model
+		sb.render(playerModel.model, world); // Render players shadow but don't actually show the
+												// personal player model
 		sb.end();
 		sl.end();
 
@@ -191,39 +124,50 @@ public class NetworkTestingState extends State {
 		renderer.begin(p.playerCam);
 		entities.forEach(e -> e.render(renderer, world));
 		for (String plyr : Client.pm.data.keySet()) {
+			Color teamColour = Color.GRAY;
 			PlayerModel otherPlayer = new PlayerModel(0, 0, 0, Color.BLUE, mb);
 			float x = 0;
 			float y = 0;
 			float z = 0;
 			float pitch = 0;
 			float yaw = 0;
+			Ball sball;
 			Float ballx = 0f, bally = 0f, ballz = 0f;
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
 					x = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("Y")) {
+				}
+				else if (p.getIdentifier().equals("Y")) {
 					y = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("Z")) {
+				}
+				else if (p.getIdentifier().equals("Z")) {
 					z = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("PITCH")) {
+				}
+				else if (p.getIdentifier().equals("PITCH")) {
 					pitch = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("YAW")) {
+				}
+				else if (p.getIdentifier().equals("YAW")) {
 					yaw = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("BallX"))
+				}
+				else if (p.getIdentifier().equals("TEAM"))
+					teamColour = p.getData().equals("RED") ? Color.RED : Color.BLUE;
+				else if (p.getIdentifier().equals("BallX"))
 					ballx = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallY"))
 					bally = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("BallZ")){
+				else if (p.getIdentifier().equals("BallZ")) {
 					ballz = Float.parseFloat(p.getData());
-					Ball sball = new Ball(ballx, bally, ballz);
+					sball = new Ball(ballx, bally, ballz);
 					sball.render(renderer, world);
-				}else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
-					launch = Boolean.parseBoolean(p.getData());
+				}
+				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr)) launch = Boolean.parseBoolean(p.getData());
 			}
-			
-			otherPlayer.model.transform.set(new Vector3(x, y+1f, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
-			//otherPlayer.model.transform.setTranslation(x, y, z);
-			//otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0);
+			otherPlayer.model.model.materials.first().set(ColorAttribute.createDiffuse(teamColour));
+			;
+			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
+			// otherPlayer.model.transform.setTranslation();
+			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI,
+			// -pitch / 180f * (float) Math.PI, 0);
 			otherPlayer.x = x;
 			otherPlayer.y = y;
 			otherPlayer.z = z;
@@ -242,20 +186,85 @@ public class NetworkTestingState extends State {
 				// System.out.println(ball.x);
 			}
 		}
-		
 		// playerModel.render(renderer, world);
 		renderer.end();
 
 	}
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		c.disconnect();
-		c = null;
-		s.stop();
-		s = null;
-		System.gc();
+	public void update(float deltaTime) {
+
+		if (ball != null) {
+
+			if (launch) {
+				ball.x = 0;
+				ball.y = 0;
+				ball.z = 0;
+				holdingPlayer = "";
+				launch = false;
+
+			}
+			ball.update(deltaTime);
+			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
+			if (ball.x < -ARENA_WIDTH / 2)
+				ball.x = -ARENA_WIDTH / 2;
+			else if (ball.x > ARENA_WIDTH / 2) ball.x = ARENA_WIDTH / 2;
+			if (ball.y < 0)
+				ball.y = 0;
+			else if (ball.y > ARENA_HEIGHT) ball.y = ARENA_HEIGHT;
+			if (ball.z < -ARENA_DEPTH / 2)
+				ball.z = -ARENA_DEPTH / 2;
+			else if (ball.z > ARENA_DEPTH / 2) ball.z = ARENA_DEPTH / 2;
+		}
+
+		c.sendPacket(new Packet("X:" + p.playerPosition.x));
+		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
+		c.sendPacket(new Packet("Z:" + p.playerPosition.z));
+		c.sendPacket(new Packet("PITCH:" + p.pitch));
+		c.sendPacket(new Packet("YAW:" + p.yaw));
+		c.sendPacket(new Packet("LAUNCH:" + Gdx.input.isTouched()));
+		if (ball != null) {
+
+			c.sendPacket(new Packet("BallX:" + ball.x));
+			c.sendPacket(new Packet("BallY:" + ball.y));
+			c.sendPacket(new Packet("BallZ:" + ball.z));
+		}
+
+		if (Gdx.input.isTouched()) {
+			Gdx.input.setCursorCatched(true);
+		}
+
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			if (!Gdx.input.isCursorCatched())
+				Gdx.app.exit();
+			else Gdx.input.setCursorCatched(false);
+		}
+
+		if (Gdx.input.isCursorCatched()) {
+			p.rotate(0.3f);
+
+			float cx = (Gdx.input.isKeyPressed(Keys.A) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -2 : 0);
+			float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -1 : 0);
+			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -2 : 0);
+			p.localTranslate(cx, cy, cz, deltaTime);
+		}
+
+		if (p.playerPosition.x < -ARENA_WIDTH / 2)
+			p.setPosition(-ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
+		else if (p.playerPosition.x > ARENA_WIDTH / 2) p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
+		if (p.playerPosition.y < 0)
+			p.setPosition(0, -p.playerPosition.y, 0);
+		else if (p.playerPosition.y > ARENA_HEIGHT) p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
+		if (p.playerPosition.z < -ARENA_DEPTH / 2)
+			p.setPosition(0, 0, -ARENA_DEPTH / 2 - p.playerPosition.z);
+		else if (p.playerPosition.z > ARENA_DEPTH / 2) p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
+
+		// playerModel.model.transform.setFromEulerAngles(-p.playerCam.view.getRotation(new
+		// Quaternion()).getYaw(), -p.playerCam.view.getRotation(new
+		// Quaternion()).getPitch(), 0);
+		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0, 1, 0)), new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
+		// playerModel.model.transform.setToTranslation(p.playerPosition);
+		launch = false;
 	}
 
 }
