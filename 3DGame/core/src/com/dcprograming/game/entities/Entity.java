@@ -6,18 +6,19 @@
  */
 package com.dcprograming.game.entities;
 
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
+import com.dcprograming.game.managers.CullingModelBatch;
 
-public class Entity extends ModelInstance {
+public class Entity {
 
-	public final BoundingBox bounds = new BoundingBox();
-	private final Vector3 dimension = new Vector3();
-	private final Vector3 center = new Vector3();
-	private final float radius;
+	protected BoundingBox bounds = new BoundingBox();
+	protected ModelInstance model;
+	protected static ModelBuilder builder = new ModelBuilder();
+	protected float x, y, z;
 
 	/**
 	 * @param model
@@ -25,18 +26,33 @@ public class Entity extends ModelInstance {
 	 * @param y
 	 * @param z
 	 */
-	public Entity(Model model, float x, float y, float z) {
-		super(model, x, y, z);
-		calculateBoundingBox(bounds);
-		bounds.getDimensions(dimension);
-		bounds.set(new Vector3(x - bounds.getWidth() / 2, y - bounds.getHeight() / 2, z - bounds.getDepth() / 2),
-				new Vector3(x + bounds.getWidth() / 2, y + bounds.getHeight() / 2, z + bounds.getDepth() / 2));
-		radius = dimension.len() / 2;
+	public Entity(float x, float y, float z) {
+
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 
-	public boolean isVisible(PerspectiveCamera cam) {
-		transform.getTranslation(dimension);
-		dimension.add(center);
-		return cam.frustum.sphereInFrustumWithoutNearFar(center, radius);
+	public void update(float deltaTime) {
+
+		if (bounds.getWidth() == 0)
+			model.calculateBoundingBox(bounds);
+		bounds.set(new Vector3(x - bounds.getWidth() / 2, y - bounds.getHeight() / 2, z - bounds.getDepth() / 2),
+				new Vector3(x + bounds.getWidth() / 2, y + bounds.getHeight() / 2, z + bounds.getDepth() / 2));
+	}
+
+	public void render(CullingModelBatch renderer) {
+
+		renderer.render(model);
+	}
+
+	public void render(CullingModelBatch renderer, Environment world) {
+
+		renderer.render(model, world);
+	}
+
+	public boolean intercept(Entity otherEntity) {
+
+		return bounds.intersects(otherEntity.bounds);
 	}
 }

@@ -15,7 +15,8 @@ public class DesktopLauncher {
 		config.resizable = false;
 		config.addIcon("Icon.png", FileType.Internal);
 		config.addIcon("Icon32.png", FileType.Internal);
-		config.title = "Quittage";
+		config.title = "Quiddich";
+		config.useGL30 = true;
 		Core game = new Core();
 		new LwjglApplication(game, config);
 	}

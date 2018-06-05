@@ -8,6 +8,7 @@ package com.dcprograming.game.states;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
@@ -15,6 +16,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -32,6 +34,7 @@ public class MenuState extends State {
 	private TextButton joinButton;
 	private TextButton quitButton;
 	private TextButton statsButton;
+	private Image title;
 	private TextField ipTextField;
 	private Stage stage;
 	private Table buttonTable;
@@ -40,7 +43,7 @@ public class MenuState extends State {
 	/**
 	 * @param stateManager
 	 */
-	public MenuState(StateManager stateManager) {
+	public MenuState(final StateManager stateManager) {
 		super(stateManager);
 
 		stage = new Stage();
@@ -95,8 +98,10 @@ public class MenuState extends State {
 		joinGameGroup.space(10);
 		joinGameGroup.addActor(ipTextField);
 		joinGameGroup.addActor(joinButton);
+		title = new Image(new Texture(Gdx.files.internal("Title.png")));
 		buttonTable = new Table();
 		buttonTable.setFillParent(true);
+		buttonTable.add(title).pad(40).center().row();
 		buttonTable.add(hostButton).pad(10).center().row();
 		buttonTable.add(joinGameGroup).pad(10).center().row();
 		buttonTable.add(statsButton).pad(10).center().row();
