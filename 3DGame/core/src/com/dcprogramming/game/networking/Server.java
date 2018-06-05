@@ -87,6 +87,7 @@ public class Server extends Thread {
 				}
 
 				out.println("USERACCEPTED");
+				pm.pushPacket(name, new Packet("TEAM:" + (usernames.size()%2==0?"RED":"BLUE")));
 				userwriters.add(out);
 
 				while (true) {
