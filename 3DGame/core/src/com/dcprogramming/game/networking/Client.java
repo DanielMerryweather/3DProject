@@ -13,6 +13,7 @@ public class Client {
 	static String connectableAddress = "";
 	static Socket socket;
 	static boolean successfullyConnected = false;
+	static boolean isHost;
 
 	// static Queue<Packet> packets = new LinkedList<Packet>();
 	public static PacketManager pm = new PacketManager("");
@@ -29,8 +30,9 @@ public class Client {
 	 * }
 	 */
 
-	public Client(String connectableAddress) {
+	public Client(String connectableAddress, boolean isHost) {
 		Client.connectableAddress = connectableAddress;
+		Client.isHost = isHost;
 		new Connection(this).start();
 		new Retriever(50, this).start();
 	}
@@ -81,14 +83,14 @@ public class Client {
 				}
 				if (!(line == null)) {
 					if (line.startsWith("USERNAME")) {
-						// out.println(System.getProperty("user.name"));
-						out.println("Daniel");
+						out.println(System.getProperty("user.name"));
+						// out.println("Daniel");
 						// out.println("Daniel");
 					} else if (line.startsWith("USERACCEPTED")) {
 						successfullyConnected = true;
 						System.out.print("TEST");
 					} else if (line != null) {
-						System.out.println("Packet Recieved: " + line);
+						// System.out.println("Packet Recieved: " + line);
 						pm = new PacketManager(line);
 						/*
 						 * for(String owner : pm.data.keySet()){ for(Packet p : pm.data.get(owner)){

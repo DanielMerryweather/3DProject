@@ -66,7 +66,7 @@ public class MenuState extends State {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 
-				stateManager.setState(StateManager.GAME);
+				stateManager.setState(new NetworkTestingState(stateManager, "127.0.0.1", true));
 			}
 		});
 		joinButton = new SizedTextButton("Join Game", buttonStyle, Core.pixels * 4, Core.pixels);
@@ -75,7 +75,7 @@ public class MenuState extends State {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 
-				stateManager.setState(StateManager.GAME);
+				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
 			}
 		});
 		statsButton = new SizedTextButton("Stats", buttonStyle, Core.pixels * 4, Core.pixels);

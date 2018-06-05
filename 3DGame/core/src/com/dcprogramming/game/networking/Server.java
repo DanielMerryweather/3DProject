@@ -20,30 +20,16 @@ public class Server {
 
 	private static PacketManager pm = new PacketManager("");
 
-	private ServerSocket servSocket;
-
-	public static void main(String[] args) {
-
-		Server s = new Server();
-		while (true)
-			try {
-				s.runServer();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	}
-
-	public void runServer() throws Exception {
+	public static void main(String[] args) throws Exception {
 		System.out.println("Server started on port " + PORT);
 		ServerSocket servSocket = new ServerSocket(PORT);
-		new Handler(servSocket.accept()).start();
-		System.out.println("Here");
-	}
-
-	public void closeServer() throws IOException {
-
-		servSocket.close();
+		try {
+			while (true) {
+				new Handler(servSocket.accept()).start();
+			}
+		} finally {
+			servSocket.close();
+		}
 	}
 
 	private static class Handler extends Thread {

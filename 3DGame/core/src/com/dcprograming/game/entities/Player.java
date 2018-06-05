@@ -2,7 +2,6 @@ package com.dcprograming.game.entities;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 public class Player {
@@ -11,7 +10,7 @@ public class Player {
 
 	int height = 1;
 
-	//Quaternion playerRotation;
+	// Quaternion playerRotation;
 	public float pitch = 90;
 	public float yaw = 0;
 	public Vector3 playerPosition;
@@ -26,25 +25,32 @@ public class Player {
 		playerCam.lookAt(new Vector3(ilx, ily, ilz));
 		playerCam.update();
 
-		//playerRotation = playerCam.view.getRotation(new Quaternion());
+		// playerRotation = playerCam.view.getRotation(new Quaternion());
 	}
 
 	public void rotate(float sens) {
 		playerCam.rotate(Vector3.Y, -sens * Gdx.input.getDeltaX());
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
-		//playerRotation = playerCam.view.getRotation(new Quaternion());
-		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z)) * (Math.abs(playerCam.up.y)/playerCam.up.y)/Math.PI*180);
-		yaw = (float) (Math.acos(playerCam.up.z/Math.sqrt(playerCam.up.x*playerCam.up.x + playerCam.up.z*playerCam.up.z))* (-Math.abs(playerCam.up.x)/playerCam.up.x)/Math.PI*180);
-		if(Float.isNaN(yaw)) {
+		// playerRotation = playerCam.view.getRotation(new Quaternion());
+		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (Math.abs(playerCam.up.y) / playerCam.up.y) / Math.PI * 180);
+		yaw = (float) (Math.acos(playerCam.up.z / Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (-Math.abs(playerCam.up.x) / playerCam.up.x) / Math.PI * 180);
+		if (Float.isNaN(yaw)) {
 			yaw = 0;
 		}
-		
-		if(pitch < 10) {
+
+		if (pitch < 10) {
 			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), sens * Gdx.input.getDeltaY());
 		}
-		if(pitch < 0) {
-			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), (float)pitch*2f);
+		if (pitch < 0) {
+			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), (float) pitch * 2f);
 		}
+		playerCam.update();
+	}
+
+	public void setPosition(float nx, float ny, float nz) {
+
+		playerCam.translate(nx, ny, nz);
+		playerPosition.add(nx, ny, nz);
 		playerCam.update();
 	}
 
@@ -52,9 +58,7 @@ public class Player {
 		float nx = dt * ((float) Math.sin(-yaw / 180 * Math.PI) * cz + (float) Math.sin((90 - yaw) / 180 * Math.PI) * cx);
 		float ny = dt * cy;
 		float nz = dt * ((float) Math.cos(-yaw / 180 * Math.PI) * cz + (float) Math.cos((90 - yaw) / 180 * Math.PI) * cx);
-		playerCam.translate(nx, ny, nz);
-		playerPosition.add(nx, ny, nz);
-		playerCam.update();
+		setPosition(nx, ny, nz);
 	}
 
 	public void logInfo() {
