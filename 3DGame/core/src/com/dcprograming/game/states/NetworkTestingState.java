@@ -32,7 +32,7 @@ import com.dcprogramming.game.networking.Server;
 
 public class NetworkTestingState extends State {
 
-	private static final float ARENA_WIDTH = 10, ARENA_DEPTH = 20, ARENA_HEIGHT = 5;
+	private static final float ARENA_WIDTH = 10, ARENA_DEPTH = 30, ARENA_HEIGHT = 5;
 
 	Ball ball;
 	Client c;
@@ -54,10 +54,10 @@ public class NetworkTestingState extends State {
 
 	CullingModelBatch sb;
 
-	DirectionalShadowLight sl;
-	Environment world;
-
 	Ball sball;
+	DirectionalShadowLight sl;
+
+	Environment world;
 
 	/**
 	 * @param stateManager
@@ -85,7 +85,7 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
-			//c.sendPacket(new Packet("BallColour:" + ball.colour));
+			// c.sendPacket(new Packet("BallColour:" + ball.colour));
 		}
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
@@ -117,7 +117,7 @@ public class NetworkTestingState extends State {
 		sb.begin(sl.getCamera());
 		entities.forEach(e -> e.render(renderer, world));
 		sb.render(playerModel.model, world); // Render players shadow but don't actually show the
-		if(sball != null){
+		if (sball != null) {
 			sball.render(sb, world);
 		}
 		sb.end();
@@ -207,7 +207,7 @@ public class NetworkTestingState extends State {
 				launch = false;
 
 			}
-			ball.update(deltaTime);
+			ball.update(deltaTime, launch);
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (ball.x < -ARENA_WIDTH / 2)
 				ball.x = -ARENA_WIDTH / 2;
