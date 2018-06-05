@@ -57,6 +57,8 @@ public class NetworkTestingState extends State {
 	DirectionalShadowLight sl;
 	Environment world;
 
+	Ball sball;
+
 	/**
 	 * @param stateManager
 	 */
@@ -70,7 +72,6 @@ public class NetworkTestingState extends State {
 
 		System.out.println(address);
 		if (isHost) (s = new Server()).start();
-		;
 		c = new Client(desiredAddress);
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
 		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
@@ -84,9 +85,10 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
-			c.sendPacket(new Packet("BallColour:" + ball.colour));
+			//c.sendPacket(new Packet("BallColour:" + ball.colour));
 		}
 		world = new Environment();
+		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
 		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f, 100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
 		world.shadowMap = sl;
 		entities.add(new Wall(-ARENA_WIDTH / 2, -0.2f, -ARENA_DEPTH / 2, ARENA_WIDTH, 0.2f, ARENA_DEPTH, Color.GREEN));
@@ -115,7 +117,9 @@ public class NetworkTestingState extends State {
 		sb.begin(sl.getCamera());
 		entities.forEach(e -> e.render(renderer, world));
 		sb.render(playerModel.model, world); // Render players shadow but don't actually show the
-												// personal player model
+		if(sball != null){
+			sball.render(sb, world);
+		}
 		sb.end();
 		sl.end();
 
@@ -123,15 +127,14 @@ public class NetworkTestingState extends State {
 
 		renderer.begin(p.playerCam);
 		entities.forEach(e -> e.render(renderer, world));
+
 		for (String plyr : Client.pm.data.keySet()) {
 			Color teamColour = Color.GRAY;
-			PlayerModel otherPlayer = new PlayerModel(0, 0, 0, Color.BLUE, mb);
 			float x = 0;
 			float y = 0;
 			float z = 0;
 			float pitch = 0;
 			float yaw = 0;
-			Ball sball;
 			Float ballx = 0f, bally = 0f, ballz = 0f;
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
@@ -162,8 +165,8 @@ public class NetworkTestingState extends State {
 				}
 				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr)) launch = Boolean.parseBoolean(p.getData());
 			}
-			otherPlayer.model.model.materials.first().set(ColorAttribute.createDiffuse(teamColour));
-			;
+
+			PlayerModel otherPlayer = new PlayerModel(0, 0, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
 			// otherPlayer.model.transform.setTranslation();
 			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI,
