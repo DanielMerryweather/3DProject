@@ -100,16 +100,14 @@ public class NetworkTestingState extends State {
 	public void update(float deltaTime) {
 
 		if (ball != null) {
+			if(launch){
+				ball.x = 0;
+				ball.y = 0;
+				ball.z = 0;
+				launch = false;
+				holdingPlayer = "";
+			}
 			ball.update(deltaTime);
-			// if (holdingPlayer != null) {
-			// holdingPlayer.update(deltaTime);
-			// ball.x = holdingPlayer.x;
-			// ball.y = holdingPlayer.y;
-			// ball.z = holdingPlayer.z;
-			// if (launch == true) {
-			// holdingPlayer = null;
-			// }
-			// }
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (ball.x < -ARENA_WIDTH / 2)
 				ball.x = -ARENA_WIDTH / 2;
@@ -123,6 +121,10 @@ public class NetworkTestingState extends State {
 				ball.z = -ARENA_DEPTH / 2;
 			else if (ball.z > ARENA_DEPTH / 2)
 				ball.z = ARENA_DEPTH / 2;
+			
+			c.sendPacket(new Packet("BallX:" + ball.x));
+			c.sendPacket(new Packet("BallY:" + ball.y));
+			c.sendPacket(new Packet("BallZ:" + ball.z));
 		}
 
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
@@ -131,11 +133,6 @@ public class NetworkTestingState extends State {
 		c.sendPacket(new Packet("PITCH:" + p.pitch));
 		c.sendPacket(new Packet("YAW:" + p.yaw));
 		c.sendPacket(new Packet("LAUNCH:" + Gdx.input.isTouched()));
-		if (ball != null) {
-			c.sendPacket(new Packet("BallX:" + ball.x));
-			c.sendPacket(new Packet("BallY:" + ball.y));
-			c.sendPacket(new Packet("BallZ:" + ball.z));
-		}
 
 		if (Gdx.input.isTouched()) {
 			Gdx.input.setCursorCatched(true);
@@ -173,7 +170,7 @@ public class NetworkTestingState extends State {
 		// playerModel.model.transform.setFromEulerAngles(-p.playerCam.view.getRotation(new
 		// Quaternion()).getYaw(), -p.playerCam.view.getRotation(new
 		// Quaternion()).getPitch(), 0);
-		playerModel.model.transform.set(p.playerPosition,
+		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0,1f,0)),
 				new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
 		// playerModel.model.transform.setToTranslation(p.playerPosition);
 		launch = false;
@@ -216,15 +213,17 @@ public class NetworkTestingState extends State {
 					ballx = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallY"))
 					bally = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("BallZ"))
+				else if (p.getIdentifier().equals("BallZ")){
 					ballz = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
+					Ball sball = new Ball(ballx, bally, ballz);
+					sball.render(renderer, world);
+				}else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
 			}
-			Ball ball = new Ball(ballx, bally, ballz);
-			ball.render(renderer, world);
-			otherPlayer.model.transform.setTranslation(x, y, z);
-			otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0);
+			
+			otherPlayer.model.transform.set(new Vector3(x, y+1f, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
+			//otherPlayer.model.transform.setTranslation(x, y, z);
+			//otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0);
 			otherPlayer.x = x;
 			otherPlayer.y = y;
 			otherPlayer.z = z;
@@ -243,6 +242,7 @@ public class NetworkTestingState extends State {
 				// System.out.println(ball.x);
 			}
 		}
+		
 		// playerModel.render(renderer, world);
 		renderer.end();
 
