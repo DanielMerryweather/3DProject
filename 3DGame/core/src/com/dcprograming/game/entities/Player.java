@@ -33,7 +33,8 @@ public class Player {
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
 		// playerRotation = playerCam.view.getRotation(new Quaternion());
 		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (Math.abs(playerCam.up.y) / playerCam.up.y) / Math.PI * 180);
-		yaw = (float) (Math.acos(playerCam.up.z / Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (-Math.abs(playerCam.up.x) / playerCam.up.x) / Math.PI * 180);
+		yaw = (float) (Math.acos(playerCam.up.z / Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (-Math.abs(playerCam.up.x) / playerCam.up.x) / Math.PI * 180
+				+ (playerCam.direction.y > 0 ? -180 : 0));
 		if (Float.isNaN(yaw)) {
 			yaw = 0;
 		}

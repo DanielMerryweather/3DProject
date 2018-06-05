@@ -27,6 +27,7 @@ import com.dcprograming.game.managers.CullingModelBatch;
 import com.dcprograming.game.managers.StateManager;
 import com.dcprogramming.game.networking.Client;
 import com.dcprogramming.game.networking.Packet;
+import com.dcprogramming.game.networking.Server;
 
 public class NetworkTestingState extends State {
 
@@ -53,6 +54,7 @@ public class NetworkTestingState extends State {
 	String desiredAddress = "127.0.0.1";
 
 	Client c;
+	Server s;
 
 	/**
 	 * @param stateManager
@@ -65,7 +67,10 @@ public class NetworkTestingState extends State {
 		p = new PhysicPlayer(-4, 0, 0, 110, 0, 0, 1);
 
 		System.out.println(address);
-		c = new Client(desiredAddress, false);
+		if (isHost)
+			(s = new Server()).start();
+		;
+		c = new Client(desiredAddress);
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
 		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
 		c.sendPacket(new Packet("Z:" + p.playerPosition.z));
@@ -136,8 +141,11 @@ public class NetworkTestingState extends State {
 			Gdx.input.setCursorCatched(true);
 		}
 
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE)) {
-			Gdx.input.setCursorCatched(false);
+		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
+			if (!Gdx.input.isCursorCatched())
+				Gdx.app.exit();
+			else
+				Gdx.input.setCursorCatched(false);
 		}
 
 		if (Gdx.input.isCursorCatched()) {
@@ -210,7 +218,7 @@ public class NetworkTestingState extends State {
 					bally = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallZ"))
 					ballz = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("LAUNCH"))
+				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
 			}
 			Ball ball = new Ball(ballx, bally, ballz);
@@ -244,6 +252,10 @@ public class NetworkTestingState extends State {
 	public void dispose() {
 		// TODO Auto-generated method stub
 		c.disconnect();
+		c = null;
+		s.stop();
+		s = null;
+		System.gc();
 	}
 
 }

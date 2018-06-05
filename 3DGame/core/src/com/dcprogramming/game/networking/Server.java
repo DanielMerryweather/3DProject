@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 import com.dcprograming.game.managers.PacketManager;
 
-public class Server {
+public class Server extends Thread {
 
 	private static final int PORT = 9001;
 
@@ -20,15 +20,37 @@ public class Server {
 
 	private static PacketManager pm = new PacketManager("");
 
-	public static void main(String[] args) throws Exception {
+	public static ServerSocket servSocket;
+
+	public static void main(String[] args) {
 		System.out.println("Server started on port " + PORT);
-		ServerSocket servSocket = new ServerSocket(PORT);
 		try {
-			while (true) {
-				new Handler(servSocket.accept()).start();
+			servSocket = new ServerSocket(PORT);
+			try {
+				while (true) {
+					new Handler(servSocket.accept()).start();
+				}
+			} finally {
+				servSocket.close();
 			}
-		} finally {
-			servSocket.close();
+		} catch (Exception e) {
+
+		}
+	}
+
+	public void run() {
+		System.out.println("Server started on port " + PORT);
+		try {
+			servSocket = new ServerSocket(PORT);
+			try {
+				while (true) {
+					new Handler(servSocket.accept()).start();
+				}
+			} finally {
+				servSocket.close();
+			}
+		} catch (Exception e) {
+
 		}
 	}
 
