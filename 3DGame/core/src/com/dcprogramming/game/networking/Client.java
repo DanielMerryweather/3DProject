@@ -117,7 +117,9 @@ public class Client {
 	public void disconnect() {
 		try {
 			cnt.stop();
-			socket.close();
+			if(socket != null) {
+				socket.close();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
