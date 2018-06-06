@@ -54,7 +54,7 @@ public class Ball extends Entity {
 		movement.scl(x, y, z);
 	}
 
-	public void update(float deltaTime, float pitch, float yaw, boolean launch) {
+	public void update(float deltaTime, float pitch, float yaw, boolean launch, boolean held) {
 
 		// if (heldPlayer < 0)
 		// for (int i = 0; i < players.size(); i++)
@@ -80,7 +80,7 @@ public class Ball extends Entity {
 			movement.scl(2f);
 			move(movement.x, movement.y, movement.z);
 			movement.scl(5.5f);
-		} else {
+		} else if(!held){
 			movement.y += grav*deltaTime;
 			move(movement.x * deltaTime, movement.y * deltaTime, movement.z * deltaTime);
 		}
