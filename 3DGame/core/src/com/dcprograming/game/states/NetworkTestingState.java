@@ -156,9 +156,7 @@ public class NetworkTestingState extends State {
 					bally = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallZ")) {
 					ballz = Float.parseFloat(p.getData());
-					sball.x = ballx;
-					sball.y = bally;
-					sball.z = ballz;
+					sball = new Ball(ballx, bally, ballz);
 					sball.render(renderer, world);
 				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
