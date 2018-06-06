@@ -6,10 +6,22 @@ import java.util.HashMap;
 
 import com.dcprogramming.game.networking.Packet;
 
+/**
+ * @author 50018003
+ * By: Daniel Merryweather
+ * The PacketManager class dynamicly manages all the packets, replacing update packets and adding initialization packets
+ * @dateCreated May 28, 2018
+ * @dateCompleted June 29, 2018
+ * @version 1.0
+ */
 public class PacketManager {
 
 	public HashMap<String, ArrayList<Packet>> data = new HashMap<String, ArrayList<Packet>>();
 
+	/**
+	 * Constructor parses out data from packetmanager in string form
+	 * @param data
+	 */
 	public PacketManager(String data) {
 		if (data.equals("")) {
 			return;
@@ -25,10 +37,19 @@ public class PacketManager {
 		}
 	}
 
+	/**
+	 * Removes a packet owner from the packet manager
+	 * @param owner
+	 */
 	public void removeOwner(String owner) {
 		data.remove(owner);
 	}
 
+	/**
+	 * Dynamically adds new packets
+	 * @param owner - Username of packet owner
+	 * @param p - Packet being pushed
+	 */
 	public void pushPacket(String owner, Packet p) {
 		if (data.keySet().contains(owner)) {
 			for (int i = 0; i < data.get(owner).size(); i++) {
@@ -45,6 +66,10 @@ public class PacketManager {
 		}
 	}
 
+	/**
+	 * Converts this packetmanager into a sendable string
+	 * @return String of data
+	 */
 	public String packageData() {
 		String result = "";
 		try {
