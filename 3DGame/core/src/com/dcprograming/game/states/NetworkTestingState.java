@@ -56,6 +56,8 @@ public class NetworkTestingState extends State {
 
 	Server s;
 
+	boolean isHost = false;
+	
 	CullingModelBatch sb;
 
 	Ball sball;
@@ -70,7 +72,8 @@ public class NetworkTestingState extends State {
 
 		super(stateManager);
 		desiredAddress = address;
-
+		this.isHost = isHost;
+		
 		renderer = new CullingModelBatch();
 		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
 
@@ -117,7 +120,9 @@ public class NetworkTestingState extends State {
 		// TODO Auto-generated method stub
 		c.disconnect();
 		c = null;
-		s.stop();
+		if(s != null) {
+			s.stop();
+		}
 		s = null;
 		System.gc();
 	}
@@ -259,10 +264,10 @@ public class NetworkTestingState extends State {
 				ball.reflectDir(0.8F, -0.8F, 0.8F);
 			}
 			if (ball.z < -ARENA_DEPTH / 2) {
-				ball.reflectDir(-0.8F, 0.8F, 0.8F);
+				ball.reflectDir(0.8F, 0.8F, -0.8F);
 				ball.z = -ARENA_DEPTH / 2;
 			} else if (ball.z > ARENA_DEPTH / 2) {
-				ball.reflectDir(-0.8F, 0.8F, 0.8F);
+				ball.reflectDir(0.8F, 0.8F, -0.8F);
 				ball.z = ARENA_DEPTH / 2;
 			}
 		}
@@ -286,7 +291,7 @@ public class NetworkTestingState extends State {
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			if (!Gdx.input.isCursorCatched())
-				if (ball != null)
+				if (isHost)
 					Gdx.app.exit();
 				else
 					stateManager.setState(StateManager.MENU);
