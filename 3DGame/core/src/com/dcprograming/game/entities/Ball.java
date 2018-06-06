@@ -23,6 +23,8 @@ public class Ball extends Entity {
 	private Vector3 movement;
 	private int heldPlayer = -1;
 
+	float grav = -9.81f;
+	
 	/**
 	 * @param model
 	 * @param x
@@ -75,11 +77,13 @@ public class Ball extends Entity {
 		if (launch) {
 			System.out.println(pitch + ", " + yaw);
 			movement.set((float) (Math.sin(-yaw / 180 * Math.PI)), (float) (Math.cos(-pitch / 180 * Math.PI)), (float) (Math.cos(yaw / 180 * Math.PI)));
-			movement.scl(1f);
+			movement.scl(2f);
 			move(movement.x, movement.y, movement.z);
 			movement.scl(5.5f);
-		} else
+		} else {
+			movement.y += grav*deltaTime;
 			move(movement.x * deltaTime, movement.y * deltaTime, movement.z * deltaTime);
+		}
 		super.update(deltaTime);
 	}
 
