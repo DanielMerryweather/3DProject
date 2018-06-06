@@ -190,6 +190,7 @@ public class NetworkTestingState extends State {
 			}
 
 			if (ball != null && holdingPlayer.equals("") && otherPlayer.intercept(ball)) {
+				// System.out.println("Hi");
 				holdingPlayer = plyr;
 				ball.colour = teamColourString;
 			}
@@ -214,9 +215,13 @@ public class NetworkTestingState extends State {
 		// System.gc();
 
 		if (ball != null) {
+			if (!holdingPlayer.equals("") && !Client.pm.data.keySet().contains(holdingPlayer)) {
+				holdingPlayer = "";
+				ball.colour = "GREY";
+			}
 
-			if (ball.intercept(goal1) || ball.intercept(goal2) && holdingPlayer.equals("")) {
-				// System.out.println("Hi");
+			if (holdingPlayer.equals("") && (ball.intercept(goal1) || ball.intercept(goal2))) {
+
 				ball.reflectDir(0, 0, 0);
 				ball.x = 0;
 				ball.y = 0;
@@ -226,6 +231,7 @@ public class NetworkTestingState extends State {
 			ball.update(deltaTime, holdingPitch, holdingYaw, launch, !holdingPlayer.equals(""));
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (launch) {
+				System.out.println("The Launch");
 				// ball.x = 0;
 				// ball.y = 0;
 				// ball.z = 0;
@@ -274,7 +280,10 @@ public class NetworkTestingState extends State {
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			if (!Gdx.input.isCursorCatched())
-				Gdx.app.exit();
+				if (ball != null)
+					Gdx.app.exit();
+				else
+					stateManager.setState(StateManager.MENU);
 			else
 				Gdx.input.setCursorCatched(false);
 		}
