@@ -1,3 +1,4 @@
+
 /**
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
@@ -20,6 +21,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.dcprograming.game.entities.Ball;
 import com.dcprograming.game.entities.Entity;
+import com.dcprograming.game.entities.GoalPost;
 import com.dcprograming.game.entities.PhysicPlayer;
 import com.dcprograming.game.entities.PlayerModel;
 import com.dcprograming.game.entities.Wall;
@@ -34,6 +36,7 @@ public class NetworkTestingState extends State {
 	private static final float ARENA_WIDTH = 10, ARENA_DEPTH = 30, ARENA_HEIGHT = 5;
 
 	Ball ball;
+	GoalPost goal1, goal2;
 	Client c;
 	String desiredAddress = "127.0.0.1";
 	ArrayList<Entity> entities = new ArrayList<Entity>();
@@ -96,6 +99,12 @@ public class NetworkTestingState extends State {
 		// Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal |
 		// Usage.Position), 0, -2, 0));
 		sb = new CullingModelBatch(new DepthShaderProvider());
+		goal1 = new GoalPost(0, 0, -ARENA_DEPTH / 4);
+		goal2 = new GoalPost(0, 0, ARENA_DEPTH / 4);
+		goal1.update(0);
+		goal2.update(0);
+		entities.add(goal1);
+		entities.add(goal2);
 
 	}
 
@@ -195,11 +204,18 @@ public class NetworkTestingState extends State {
 	@Override
 	public void update(float deltaTime) {
 
-		//System.gc();
-		
+		// System.gc();
+
 		if (ball != null) {
 
-			ball.update(deltaTime, holdingPitch, holdingYaw, launch);
+			if (ball.intercept(goal1) || ball.intercept(goal2) && holdingPlayer.equals("")) {
+				// System.out.println("Hi");
+				ball.reflectDir(0, 0, 0);
+				ball.x = 0;
+				ball.y = 0;
+				ball.z = 0;
+			}
+			ball.update(deltaTime, holdingPitch, holdingYaw, launch, !holdingPlayer.equals(""));
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (launch) {
 				// ball.x = 0;
@@ -211,23 +227,23 @@ public class NetworkTestingState extends State {
 			}
 			if (ball.x < -ARENA_WIDTH / 2) {
 				ball.x = -ARENA_WIDTH / 2;
-				ball.reflectDir(-1, 1, 1);
+				ball.reflectDir(-0.8F, 0.8F, 0.8F);
 			} else if (ball.x > ARENA_WIDTH / 2) {
 				ball.x = ARENA_WIDTH / 2;
-				ball.reflectDir(-1, 1, 1);
+				ball.reflectDir(-0.8F, 0.8F, 0.8F);
 			}
 			if (ball.y < 0) {
 				ball.y = 0;
-				ball.reflectDir(1, -1, 1);
+				ball.reflectDir(0.8F, -0.8F, 0.8F);
 			} else if (ball.y > ARENA_HEIGHT) {
 				ball.y = ARENA_HEIGHT;
-				ball.reflectDir(1, -1, 1);
+				ball.reflectDir(0.8F, -0.8F, 0.8F);
 			}
 			if (ball.z < -ARENA_DEPTH / 2) {
-				ball.reflectDir(1, 1, -1);
+				ball.reflectDir(-0.8F, 0.8F, 0.8F);
 				ball.z = -ARENA_DEPTH / 2;
 			} else if (ball.z > ARENA_DEPTH / 2) {
-				ball.reflectDir(1, 1, -1);
+				ball.reflectDir(-0.8F, 0.8F, 0.8F);
 				ball.z = ARENA_DEPTH / 2;
 			}
 		}
