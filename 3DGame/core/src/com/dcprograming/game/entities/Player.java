@@ -31,9 +31,7 @@ public class Player {
 	public void rotate(float sens) {
 		playerCam.rotate(Vector3.Y, -sens * Gdx.input.getDeltaX());
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
-		if(playerCam.up.y < 0) {
-			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), 2*sens * Gdx.input.getDeltaY());
-		}
+		
 		// playerRotation = playerCam.view.getRotation(new Quaternion());
 		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (playerCam.direction.y > 0 ? 1:-1) / Math.PI * 180 + (playerCam.direction.y > 0 ? 0:180));
 		yaw = (float) (Math.acos(playerCam.up.z / Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (-Math.abs(playerCam.up.x) / playerCam.up.x) / Math.PI * 180
@@ -42,11 +40,12 @@ public class Player {
 			yaw = 0;
 		}
 
-		if (pitch < 10) {
-			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), sens * Gdx.input.getDeltaY());
-		}
-		if (pitch > 170) {
-			playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), sens * Gdx.input.getDeltaY());
+		while(playerCam.up.y < 0) {
+			if(Math.abs(pitch) < 90) {
+				playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), 1);
+			}else {
+				playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -1);
+			}
 		}
 		playerCam.update();
 	}
