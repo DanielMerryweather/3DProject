@@ -6,8 +6,6 @@
  */
 package com.dcprograming.game.entities;
 
-import java.util.ArrayList;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -16,7 +14,6 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 
 public class Ball extends Entity {
@@ -50,35 +47,36 @@ public class Ball extends Entity {
 
 	}
 
-	public void update(float deltaTime, ArrayList<PlayerModel> players, boolean launch) {
+	public void reflectDir(float x, float y, float z) {
 
-		if (heldPlayer < 0)
-			for (int i = 0; i < players.size(); i++)
-				if (players.get(i).intercept(this)) {
-					heldPlayer = i;
-					break;
-				}
-		if (heldPlayer >= 0) {
-			PlayerModel player = players.get(heldPlayer);
-			// x = (float) (player.x + RADIUS * 0.9f * (float)
-			// Math.cos(-player.playerRotation.getYaw() / 180 * Math.PI));
-			y = player.y - player.HEIGHT * 0.3f;
-			x = player.x;
-			z = player.z;
-			model.transform.setTranslation(x, y, z);
-			changeColor(player.teamColour);
-			// z = player.z + (float) (player.z + RADIUS * 0.9f *
-			// Math.sin(-player.playerRotation.getYaw() / 180 * Math.PI));
+		movement.scl(x, y, z);
+	}
 
-			if (launch) {
-				movement.set((float) (-Math.sin(-player.model.transform.getRotation(new Quaternion(), true).getYaw() / 180 * Math.PI)),
-						(float) (Math.sin(player.model.transform.getRotation(new Quaternion(), true).getPitch() / 180 * Math.PI)),
-						(float) (-Math.cos(-player.model.transform.getRotation(new Quaternion(), true).getYaw() / 180 * Math.PI)));
-				movement.scl(0.5f);
-				move(movement.x, movement.y, movement.z);
-				movement.scl(5.5f);
-				heldPlayer = -1;
-			}
+	public void update(float deltaTime, float pitch, float yaw, boolean launch) {
+
+		// if (heldPlayer < 0)
+		// for (int i = 0; i < players.size(); i++)
+		// if (player.intercept(this)) {
+		// heldPlayer = i;
+		// break;
+		// }
+		// if (heldPlayer >= 0) {
+		// PlayerModel player = players.get(heldPlayer);
+		// // x = (float) (player.x + RADIUS * 0.9f * (float)
+		// // Math.cos(-player.playerRotation.getYaw() / 180 * Math.PI));
+		// y = player.y - player.HEIGHT * 0.3f;
+		// x = player.x;
+		// z = player.z;
+		// model.transform.setTranslation(x, y, z);
+		// changeColor(player.teamColour);
+		// // z = player.z + (float) (player.z + RADIUS * 0.9f *
+		// // Math.sin(-player.playerRotation.getYaw() / 180 * Math.PI));
+
+		if (launch) {
+			movement.set((float) (-Math.sin(-pitch / 180 * Math.PI)), (float) (Math.sin(pitch / 180 * Math.PI)), (float) (Math.cos(-yaw / 180 * Math.PI)));
+			movement.scl(1f);
+			move(movement.x, movement.y, movement.z);
+			movement.scl(5.5f);
 		} else
 			move(movement.x * deltaTime, movement.y * deltaTime, movement.z * deltaTime);
 		super.update(deltaTime);

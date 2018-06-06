@@ -35,7 +35,7 @@ public class Client {
 		this.connectableAddress = connectableAddress;
 		cnt = new Connection(this, System.getProperty("user.name"));
 		cnt.start();
-		new Retriever(8, this).start();
+		new Retriever(15, this).start();
 	}
 
 	public Client() {
@@ -93,7 +93,7 @@ public class Client {
 				if (!(line == null)) {
 					if (line.startsWith("USERNAME")) {
 						out.println(name);
-						System.out.print(name);
+						// System.out.print(name);
 						// out.println("Daniel");
 						// out.println("Colton");
 					} else if (line.startsWith("USERACCEPTED")) {

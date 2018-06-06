@@ -10,7 +10,7 @@ import com.dcprograming.game.core.Core;
 public class DesktopLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		int pixels = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 9 / 2, Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 16 / 2);
+		int pixels = (int) Math.min(Toolkit.getDefaultToolkit().getScreenSize().getHeight() / 9, Toolkit.getDefaultToolkit().getScreenSize().getWidth() / 16);
 		config.width = pixels * 16;
 		config.height = pixels * 9;
 		System.out.println("Initial Screen Resolution: " + config.width + "x" + config.height);

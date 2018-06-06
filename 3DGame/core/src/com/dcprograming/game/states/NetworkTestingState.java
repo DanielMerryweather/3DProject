@@ -18,7 +18,6 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.dcprograming.game.entities.Ball;
 import com.dcprograming.game.entities.Entity;
 import com.dcprograming.game.entities.PhysicPlayer;
@@ -41,11 +40,10 @@ public class NetworkTestingState extends State {
 
 	// PlayerModel holdingPlayer;
 	String holdingPlayer = "";
-
+	float holdingPitch = 0, holdingYaw = 0;
 	boolean launch;
 	ModelBuilder mb = new ModelBuilder();
 
-	BoundingBox otherPlayerBounds;
 	PhysicPlayer p;
 	PlayerModel playerModel;
 	CullingModelBatch renderer;
@@ -68,10 +66,11 @@ public class NetworkTestingState extends State {
 		desiredAddress = address;
 
 		renderer = new CullingModelBatch();
-		p = new PhysicPlayer(-4, 0, 0, 110, 0, 0, 1);
+		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
 
 		System.out.println(address);
-		if (isHost) (s = new Server()).start();
+		if (isHost)
+			(s = new Server()).start();
 		c = new Client(desiredAddress);
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
 		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
@@ -79,7 +78,7 @@ public class NetworkTestingState extends State {
 		c.sendPacket(new Packet("PITCH:" + p.pitch));
 		c.sendPacket(new Packet("YAW:" + p.yaw));
 		c.sendPacket(new Packet("LAUNCH:" + Gdx.input.isTouched()));
-		playerModel = new PlayerModel(0, 5, 0, Color.RED, mb);
+		playerModel = new PlayerModel(0, -10, 0, Color.RED, mb);
 		if (isHost) {
 			ball = new Ball(0, 0, 0);
 			c.sendPacket(new Packet("BallX:" + ball.x));
@@ -89,7 +88,8 @@ public class NetworkTestingState extends State {
 		}
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
-		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f, 100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
+		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f,
+				100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
 		world.shadowMap = sl;
 		entities.add(new Wall(-ARENA_WIDTH / 2, -0.2f, -ARENA_DEPTH / 2, ARENA_WIDTH, 0.2f, ARENA_DEPTH, Color.GREEN));
 		// entities.add(new Entity(mb.createBox(10, 2, 10, new
@@ -139,20 +139,15 @@ public class NetworkTestingState extends State {
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
 					x = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("Y")) {
+				} else if (p.getIdentifier().equals("Y")) {
 					y = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("Z")) {
+				} else if (p.getIdentifier().equals("Z")) {
 					z = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("PITCH")) {
+				} else if (p.getIdentifier().equals("PITCH")) {
 					pitch = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("YAW")) {
+				} else if (p.getIdentifier().equals("YAW")) {
 					yaw = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("TEAM"))
+				} else if (p.getIdentifier().equals("TEAM"))
 					teamColour = p.getData().equals("RED") ? Color.RED : Color.BLUE;
 				else if (p.getIdentifier().equals("BallX"))
 					ballx = Float.parseFloat(p.getData());
@@ -162,14 +157,15 @@ public class NetworkTestingState extends State {
 					ballz = Float.parseFloat(p.getData());
 					sball = new Ball(ballx, bally, ballz);
 					sball.render(renderer, world);
-				}
-				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr)) launch = Boolean.parseBoolean(p.getData());
+				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
+					launch = Boolean.parseBoolean(p.getData());
 			}
 
-			PlayerModel otherPlayer = new PlayerModel(0, 0, 0, teamColour, mb);
+			PlayerModel otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
 			// otherPlayer.model.transform.setTranslation();
-			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float) Math.PI,
+			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float)
+			// Math.PI,
 			// -pitch / 180f * (float) Math.PI, 0);
 			otherPlayer.x = x;
 			otherPlayer.y = y;
@@ -183,6 +179,8 @@ public class NetworkTestingState extends State {
 				holdingPlayer = plyr;
 			}
 			if (holdingPlayer.equals(plyr)) {
+				holdingPitch = pitch;
+				holdingYaw = yaw;
 				this.ball.x = otherPlayer.x;
 				this.ball.y = otherPlayer.y;
 				this.ball.z = otherPlayer.z;
@@ -199,25 +197,37 @@ public class NetworkTestingState extends State {
 
 		if (ball != null) {
 
+			ball.update(deltaTime, holdingPitch, holdingYaw, launch);
+			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (launch) {
-				ball.x = 0;
-				ball.y = 0;
-				ball.z = 0;
+				// ball.x = 0;
+				// ball.y = 0;
+				// ball.z = 0;
 				holdingPlayer = "";
 				launch = false;
 
 			}
-			ball.update(deltaTime, launch);
-			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
-			if (ball.x < -ARENA_WIDTH / 2)
+			if (ball.x < -ARENA_WIDTH / 2) {
 				ball.x = -ARENA_WIDTH / 2;
-			else if (ball.x > ARENA_WIDTH / 2) ball.x = ARENA_WIDTH / 2;
-			if (ball.y < 0)
+				ball.reflectDir(-1, 1, 1);
+			} else if (ball.x > ARENA_WIDTH / 2) {
+				ball.x = ARENA_WIDTH / 2;
+				ball.reflectDir(-1, 1, 1);
+			}
+			if (ball.y < 0) {
 				ball.y = 0;
-			else if (ball.y > ARENA_HEIGHT) ball.y = ARENA_HEIGHT;
-			if (ball.z < -ARENA_DEPTH / 2)
+				ball.reflectDir(1, -1, 1);
+			} else if (ball.y > ARENA_HEIGHT) {
+				ball.y = ARENA_HEIGHT;
+				ball.reflectDir(1, -1, 1);
+			}
+			if (ball.z < -ARENA_DEPTH / 2) {
+				ball.reflectDir(1, 1, -1);
 				ball.z = -ARENA_DEPTH / 2;
-			else if (ball.z > ARENA_DEPTH / 2) ball.z = ARENA_DEPTH / 2;
+			} else if (ball.z > ARENA_DEPTH / 2) {
+				ball.reflectDir(1, 1, -1);
+				ball.z = ARENA_DEPTH / 2;
+			}
 		}
 
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
@@ -240,32 +250,37 @@ public class NetworkTestingState extends State {
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			if (!Gdx.input.isCursorCatched())
 				Gdx.app.exit();
-			else Gdx.input.setCursorCatched(false);
+			else
+				Gdx.input.setCursorCatched(false);
 		}
 
 		if (Gdx.input.isCursorCatched()) {
 			p.rotate(0.3f);
 
-			float cx = (Gdx.input.isKeyPressed(Keys.A) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -2 : 0);
-			float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -1 : 0);
-			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 2 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -2 : 0);
+			float cx = (Gdx.input.isKeyPressed(Keys.A) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -4 : 0);
+			float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -4 : 0);
+			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -4 : 0);
 			p.localTranslate(cx, cy, cz, deltaTime);
 		}
 
 		if (p.playerPosition.x < -ARENA_WIDTH / 2)
 			p.setPosition(-ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
-		else if (p.playerPosition.x > ARENA_WIDTH / 2) p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
+		else if (p.playerPosition.x > ARENA_WIDTH / 2)
+			p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
 		if (p.playerPosition.y < 0)
 			p.setPosition(0, -p.playerPosition.y, 0);
-		else if (p.playerPosition.y > ARENA_HEIGHT) p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
+		else if (p.playerPosition.y > ARENA_HEIGHT)
+			p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
 		if (p.playerPosition.z < -ARENA_DEPTH / 2)
 			p.setPosition(0, 0, -ARENA_DEPTH / 2 - p.playerPosition.z);
-		else if (p.playerPosition.z > ARENA_DEPTH / 2) p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
+		else if (p.playerPosition.z > ARENA_DEPTH / 2)
+			p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
 
 		// playerModel.model.transform.setFromEulerAngles(-p.playerCam.view.getRotation(new
 		// Quaternion()).getYaw(), -p.playerCam.view.getRotation(new
 		// Quaternion()).getPitch(), 0);
-		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0, 1, 0)), new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
+		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0, 1, 0)),
+				new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
 		// playerModel.model.transform.setToTranslation(p.playerPosition);
 		launch = false;
 	}
