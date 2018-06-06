@@ -6,6 +6,9 @@
  */
 package com.dcprograming.game.states;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -73,8 +76,14 @@ public class MenuState extends State {
 
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-
-				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
+				boolean valid = false;
+				try {
+					InetAddress i = InetAddress.getByName(ipTextField.getText());
+					valid = i.isReachable(100);
+				} catch (Exception e) {}
+				if(valid) {
+					stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
+				}
 			}
 		});
 
