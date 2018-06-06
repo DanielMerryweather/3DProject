@@ -17,9 +17,9 @@ public class GoalPost extends Entity {
 	private static final float THICKNESS = 0.5f;
 	private static final float HEIGHT = 2;
 
-	public GoalPost(float x, float y, float z) {
+	public GoalPost(float x, float y, float z, Color colour) {
 		super(x, y + HEIGHT / 2, z);
-		model = new ModelInstance(builder.createBox(THICKNESS, HEIGHT, THICKNESS, new Material(ColorAttribute.createDiffuse(Color.YELLOW)), Usage.Position | Usage.Normal), x, y + HEIGHT / 2, z);
+		model = new ModelInstance(builder.createBox(THICKNESS, HEIGHT, THICKNESS, new Material(ColorAttribute.createDiffuse(colour)), Usage.Position | Usage.Normal), x, y + HEIGHT / 2, z);
 	}
 
 }
