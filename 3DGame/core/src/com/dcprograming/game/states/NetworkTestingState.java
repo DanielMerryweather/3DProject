@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalShadowLight;
@@ -18,7 +21,12 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
+import com.dcprograming.game.core.Core;
 import com.dcprograming.game.entities.Ball;
 import com.dcprograming.game.entities.Entity;
 import com.dcprograming.game.entities.GoalPost;
@@ -31,6 +39,7 @@ import com.dcprogramming.game.networking.Client;
 import com.dcprogramming.game.networking.Packet;
 import com.dcprogramming.game.networking.Server;
 
+@SuppressWarnings("deprecation")
 public class NetworkTestingState extends State {
 
 	private static final float ARENA_WIDTH = 10, ARENA_DEPTH = 30, ARENA_HEIGHT = 5;
@@ -42,6 +51,9 @@ public class NetworkTestingState extends State {
 	ArrayList<Entity> entities = new ArrayList<Entity>();
 	Label redScoreLabel;
 	Label blueScoreLabel;
+	int redScore = 0;
+	int blueScore = 0;
+	Stage stage;
 
 	// PlayerModel holdingPlayer;
 	String holdingPlayer = "";
@@ -68,6 +80,7 @@ public class NetworkTestingState extends State {
 	/**
 	 * @param stateManager
 	 */
+	@SuppressWarnings("deprecation")
 	public NetworkTestingState(StateManager stateManager, String address, boolean isHost) {
 
 		super(stateManager);
@@ -94,6 +107,8 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
 			c.sendPacket(new Packet("BallColour:" + ball.colour));
+			c.sendPacket(new Packet("RedScore:" + redScore));
+			c.sendPacket(new Packet("BlueScore:" + blueScore));
 		}
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
@@ -105,12 +120,30 @@ public class NetworkTestingState extends State {
 		// Material(ColorAttribute.createDiffuse(Color.GREEN)), Usage.Normal |
 		// Usage.Position), 0, -2, 0));
 		sb = new CullingModelBatch(new DepthShaderProvider());
-		goal1 = new GoalPost(0, 0, -ARENA_DEPTH / 4);
-		goal2 = new GoalPost(0, 0, ARENA_DEPTH / 4);
+		goal1 = new GoalPost(0, 2, -ARENA_DEPTH / 4, Color.CYAN);
+		goal2 = new GoalPost(0, 2, ARENA_DEPTH / 4, Color.CORAL);
 		goal1.update(0);
 		goal2.update(0);
 		entities.add(goal1);
 		entities.add(goal2);
+		FreeTypeFontGenerator fontGen = new FreeTypeFontGenerator(Gdx.files.internal("YellowSwamp.ttf"));
+		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+		parameter.size = (int) (Core.pixels * 0.8f);
+		BitmapFont scoreFont = fontGen.generateFont(parameter);
+		LabelStyle redScoreStyle = new LabelStyle(scoreFont, Color.RED);
+		LabelStyle blueScoreStyle = new LabelStyle(scoreFont, Color.BLUE);
+		redScoreLabel = new Label(String.valueOf(redScore), redScoreStyle);
+		blueScoreLabel = new Label(String.valueOf(blueScore), blueScoreStyle);
+
+		stage = new Stage();
+		HorizontalGroup scores = new HorizontalGroup();
+		scores.space(Core.pixels);
+		scores.addActor(blueScoreLabel);
+		scores.addActor(redScoreLabel);
+		Container<HorizontalGroup> container = new Container<HorizontalGroup>(scores).pad(Core.pixels / 2).top();
+		stage.addActor(container);
+		container.setFillParent(true);
+		// scores.setPosition(ARENA_WIDTH / 2, ARENA_HEIGHT / 2);
 
 	}
 
@@ -184,6 +217,10 @@ public class NetworkTestingState extends State {
 					ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
 				else if (p.getIdentifier().equals("HoldingPlayer"))
 					isHeld = p.getData().equals(System.getProperty("user.name"));
+				else if (p.getIdentifier().equals("BlueScore"))
+					blueScoreLabel.setText(p.getData());
+				else if (p.getIdentifier().equals("RedScore"))
+					redScoreLabel.setText(p.getData());
 			}
 			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
@@ -218,7 +255,8 @@ public class NetworkTestingState extends State {
 
 		// playerModel.render(renderer, world);
 		renderer.end();
-
+		stage.act();
+		stage.draw();
 	}
 
 	@Override
@@ -232,21 +270,22 @@ public class NetworkTestingState extends State {
 				ball.colour = "GREY";
 			}
 
-			if (holdingPlayer.equals("") && (ball.intercept(goal1) || ball.intercept(goal2))) {
+			if (holdingPlayer.equals("") && (ball.intercept(goal1) && ball.colour.equals("RED") || ball.intercept(goal2) && ball.colour.equals("BLUE"))) {
 
 				ball.reflectDir(0, 0, 0);
 				ball.x = 0;
 				ball.y = 0;
 				ball.z = 0;
+				if (ball.colour.equals("RED"))
+					redScore++;
+				else
+					blueScore++;
+				// System.out.println(redScore + " " + blueScore);
 				ball.colour = "GREY";
 			}
 			ball.update(deltaTime, holdingPitch, holdingYaw, launch, !holdingPlayer.equals(""));
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
 			if (launch) {
-				System.out.println("The Launch");
-				// ball.x = 0;
-				// ball.y = 0;
-				// ball.z = 0;
 				holdingPlayer = "";
 				launch = false;
 
@@ -286,6 +325,8 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallZ:" + ball.z));
 			c.sendPacket(new Packet("BallColour:" + ball.colour));
 			c.sendPacket(new Packet("HoldingPlayer:" + holdingPlayer));
+			c.sendPacket(new Packet("RedScore:" + redScore));
+			c.sendPacket(new Packet("BlueScore:" + blueScore));
 		}
 
 		if (Gdx.input.isTouched()) {
