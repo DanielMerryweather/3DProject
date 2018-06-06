@@ -143,6 +143,7 @@ public class NetworkTestingState extends State {
 		PlayerModel otherPlayer;
 		for (String plyr : Client.pm.data.keySet()) {
 			Color teamColour = Color.GRAY;
+			Color ballColour = Color.GRAY;
 			String teamColourString = "GREY";
 			float x = 0;
 			float y = 0;
@@ -174,6 +175,8 @@ public class NetworkTestingState extends State {
 					sball.render(renderer, world);
 				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
+				else if (p.getIdentifier().equals("BallColour"))
+					ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
 			}
 			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
@@ -202,8 +205,10 @@ public class NetworkTestingState extends State {
 				this.ball.z = otherPlayer.z;
 				// System.out.println(ball.x);
 			}
+			if (sball != null)
+				sball.changeColor(ballColour);
 		}
-		sball.changeColor(ball.colour.equals("BLUE") ? Color.BLUE : ball.colour.equals("RED") ? Color.RED : Color.GRAY);
+
 		// playerModel.render(renderer, world);
 		renderer.end();
 
@@ -272,6 +277,7 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
+			c.sendPacket(new Packet("BallColour:" + ball.colour));
 		}
 
 		if (Gdx.input.isTouched()) {
