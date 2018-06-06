@@ -21,10 +21,10 @@ public class Ball extends Entity {
 	private static final float RADIUS = .3f;
 
 	private Vector3 movement;
-	private int heldPlayer = -1;
+	public String colour = "GREY";
 
 	float grav = -9.81f;
-	
+
 	/**
 	 * @param model
 	 * @param x
@@ -80,8 +80,8 @@ public class Ball extends Entity {
 			movement.scl(2f);
 			move(movement.x, movement.y, movement.z);
 			movement.scl(5.5f);
-		} else if(!held){
-			movement.y += grav*deltaTime;
+		} else if (!held) {
+			movement.y += grav * deltaTime;
 			move(movement.x * deltaTime, movement.y * deltaTime, movement.z * deltaTime);
 		}
 		super.update(deltaTime);

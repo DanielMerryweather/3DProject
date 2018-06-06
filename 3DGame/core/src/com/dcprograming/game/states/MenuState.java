@@ -34,7 +34,6 @@ public class MenuState extends State {
 	private SizedTextButton hostButton;
 	private SizedTextButton joinButton;
 	private SizedTextButton quitButton;
-	private SizedTextButton statsButton;
 	private Image title;
 	private TextField ipTextField;
 	private Stage stage;
@@ -78,7 +77,7 @@ public class MenuState extends State {
 				stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
 			}
 		});
-		statsButton = new SizedTextButton("Stats", buttonStyle, Core.pixels * 4, Core.pixels);
+
 		quitButton = new SizedTextButton("Quit", buttonStyle, Core.pixels * 4, Core.pixels);
 		quitButton.addListener(new ChangeListener() {
 
@@ -105,7 +104,6 @@ public class MenuState extends State {
 		buttonTable.add(title).size(Core.pixels * 8, Core.pixels * 3).pad(40).center().row();
 		buttonTable.add(hostButton).pad(10).center().row();
 		buttonTable.add(joinGameGroup).pad(10).center().row();
-		buttonTable.add(statsButton).pad(10).center().row();
 		buttonTable.add(quitButton).pad(10).center().row();
 		stage.addActor(buttonTable);
 	}

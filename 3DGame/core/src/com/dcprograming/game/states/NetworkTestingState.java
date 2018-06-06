@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.dcprograming.game.entities.Ball;
 import com.dcprograming.game.entities.Entity;
 import com.dcprograming.game.entities.GoalPost;
@@ -40,6 +41,8 @@ public class NetworkTestingState extends State {
 	Client c;
 	String desiredAddress = "127.0.0.1";
 	ArrayList<Entity> entities = new ArrayList<Entity>();
+	Label redScoreLabel;
+	Label blueScoreLabel;
 
 	// PlayerModel holdingPlayer;
 	String holdingPlayer = "";
@@ -87,7 +90,7 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
-			// c.sendPacket(new Packet("BallColour:" + ball.colour));
+			c.sendPacket(new Packet("BallColour:" + ball.colour));
 		}
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
@@ -140,6 +143,7 @@ public class NetworkTestingState extends State {
 		PlayerModel otherPlayer;
 		for (String plyr : Client.pm.data.keySet()) {
 			Color teamColour = Color.GRAY;
+			String teamColourString = "GREY";
 			float x = 0;
 			float y = 0;
 			float z = 0;
@@ -157,9 +161,10 @@ public class NetworkTestingState extends State {
 					pitch = Float.parseFloat(p.getData());
 				} else if (p.getIdentifier().equals("YAW")) {
 					yaw = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("TEAM"))
-					teamColour = p.getData().equals("RED") ? Color.RED : Color.BLUE;
-				else if (p.getIdentifier().equals("BallX"))
+				} else if (p.getIdentifier().equals("TEAM")) {
+					teamColourString = p.getData();
+					teamColour = teamColourString.equals("RED") ? Color.RED : Color.BLUE;
+				} else if (p.getIdentifier().equals("BallX"))
 					ballx = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallY"))
 					bally = Float.parseFloat(p.getData());
@@ -186,6 +191,7 @@ public class NetworkTestingState extends State {
 
 			if (ball != null && holdingPlayer.equals("") && otherPlayer.intercept(ball)) {
 				holdingPlayer = plyr;
+				ball.colour = teamColourString;
 			}
 			if (holdingPlayer.equals(plyr)) {
 				holdingPitch = pitch;
@@ -196,6 +202,7 @@ public class NetworkTestingState extends State {
 				// System.out.println(ball.x);
 			}
 		}
+		sball.changeColor(ball.colour.equals("BLUE") ? Color.BLUE : ball.colour.equals("RED") ? Color.RED : Color.GRAY);
 		// playerModel.render(renderer, world);
 		renderer.end();
 
@@ -214,6 +221,7 @@ public class NetworkTestingState extends State {
 				ball.x = 0;
 				ball.y = 0;
 				ball.z = 0;
+				ball.colour = "GREY";
 			}
 			ball.update(deltaTime, holdingPitch, holdingYaw, launch, !holdingPlayer.equals(""));
 			ball.model.transform.setTranslation(ball.x, ball.y, ball.z);
