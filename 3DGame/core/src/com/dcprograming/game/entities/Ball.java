@@ -73,7 +73,8 @@ public class Ball extends Entity {
 		// // Math.sin(-player.playerRotation.getYaw() / 180 * Math.PI));
 
 		if (launch) {
-			movement.set((float) (-Math.sin(-pitch / 180 * Math.PI)), (float) (Math.sin(pitch / 180 * Math.PI)), (float) (Math.cos(-yaw / 180 * Math.PI)));
+			System.out.println(pitch + ", " + yaw);
+			movement.set((float) (Math.sin(-yaw / 180 * Math.PI)), (float) (Math.cos(-pitch / 180 * Math.PI)), (float) (Math.cos(yaw / 180 * Math.PI)));
 			movement.scl(1f);
 			move(movement.x, movement.y, movement.z);
 			movement.scl(5.5f);
