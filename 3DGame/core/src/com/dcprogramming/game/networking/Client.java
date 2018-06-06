@@ -8,63 +8,39 @@ import java.net.Socket;
 
 import com.dcprograming.game.managers.PacketManager;
 
+/**
+ * @author 50018003
+ * By: Daniel Merryweather
+ * The Client class, establishes a connection to a desired server and recieves all packets in its packet manager
+ * @dateCreated May 28, 2018
+ * @dateCompleted June 6, 2018
+ * @version 1.5
+ */
 public class Client {
 
 	static String connectableAddress = "";
 	static Socket socket;
 	static boolean successfullyConnected = false;
-
-	// static Queue<Packet> packets = new LinkedList<Packet>();
 	public static PacketManager pm = new PacketManager("");
 
 	static BufferedReader in;
 	static PrintWriter out;
 
-	static Connection cnt;
+	static Connection cnct;
 
-	/*
-	 * public static void main(String[] args) { Client c = new Client("127.0.0.1");
-	 * 
-	 * c.sendPacket(new Packet("Y:45"));
-	 * 
-	 * Scanner sl = new Scanner(System.in); c.sendPacket(new Packet(sl.nextLine()));
-	 * }
+	/**
+	 * Constructor for connecting to a specific server
+	 * @param connectableAddress - String containing an ip
 	 */
-
 	public Client(String connectableAddress) {
 		this.connectableAddress = connectableAddress;
-		cnt = new Connection(this, System.getProperty("user.name"));
-		cnt.start();
-		new Retriever(15, this).start();
+		cnct = new Connection(this, System.getProperty("user.name"));
+		cnct.start();
 	}
 
-	public Client() {
-		this.connectableAddress = "127.0.0.1";
-		new Connection(this, "BALL").start();
-		new Retriever(8, this).start();
-	}
-
-	private static class Retriever extends Thread {
-
-		int tickTime;
-		Client c;
-
-		public Retriever(int tickTime, Client c) {
-			this.tickTime = tickTime;
-			this.c = c;
-		}
-
-		public void run() {
-			while (true) {
-				c.serverUpdateRequest();
-				try {
-					Thread.sleep(tickTime);
-				} catch (Exception e) {
-				}
-			}
-		}
-	}
-
+	/**
+	 * The connection thread establishes a connection separate from the main application so updates can be done asynchronously, after the connection has been made, basic information such as the username and team are exchanged initally
+	 */
 	private static class Connection extends Thread {
 
 		Client c;
@@ -93,20 +69,11 @@ public class Client {
 				if (!(line == null)) {
 					if (line.startsWith("USERNAME")) {
 						out.println(name);
-						// System.out.print(name);
-						// out.println("Daniel");
-						// out.println("Colton");
 					} else if (line.startsWith("USERACCEPTED")) {
 						successfullyConnected = true;
-						// System.out.print("TEST");
 					} else if (line != null) {
 						System.out.println("Packet Recieved: " + line);
 						pm = new PacketManager(line);
-						/*
-						 * for(String owner : pm.data.keySet()){ for(Packet p : pm.data.get(owner)){
-						 * c.handlePacket(owner, p); } }
-						 */
-						// System.out.println(pm.packageData());
 					}
 				}
 			}
@@ -114,9 +81,12 @@ public class Client {
 
 	}
 
+	/**
+	 * Disconnects the current connection for safe exit of the application
+	 */
 	public void disconnect() {
 		try {
-			cnt.stop();
+			cnct.stop();
 			if(socket != null) {
 				socket.close();
 			}
@@ -125,14 +95,19 @@ public class Client {
 		}
 	}
 
+	/**
+	 * Asks the server to send all the most recent packets back to the client
+	 */
 	public void serverUpdateRequest() {
 		if (successfullyConnected) {
 			out.println("UPDATEREQUEST");
 		}
 	}
 
-	// public abstract void handlePacket(String owner, Packet p);
-
+	/**
+	 * Using this connection sends a packet to the server
+	 * @param p - Packet to be sent
+	 */
 	public void sendPacket(Packet p) {
 		if (successfullyConnected) {
 			out.println(p.repackage());

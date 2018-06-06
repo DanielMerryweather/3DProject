@@ -10,6 +10,14 @@ import java.util.ArrayList;
 
 import com.dcprograming.game.managers.PacketManager;
 
+/**
+ * @author 50018003
+ * By: Daniel Merryweather
+ * The Server class starts up a server that is able to receive and distribute packets based on its connected users
+ * @dateCreated May 28, 2018
+ * @dateCompleted June 5, 2018
+ * @version 1.3
+ */
 public class Server extends Thread {
 
 	private static final int PORT = 9001;
@@ -22,22 +30,9 @@ public class Server extends Thread {
 
 	public static ServerSocket servSocket;
 
-	public static void main(String[] args) {
-		System.out.println("Server started on port " + PORT);
-		try {
-			servSocket = new ServerSocket(PORT);
-			try {
-				while (true) {
-					new Handler(servSocket.accept()).start();
-				}
-			} finally {
-				servSocket.close();
-			}
-		} catch (Exception e) {
-
-		}
-	}
-
+	/**
+	 * The initialization of this server thread, actively tries to accept new connections to the server
+	 */
 	public void run() {
 		System.out.println("Server started on port " + PORT);
 		try {
@@ -54,6 +49,9 @@ public class Server extends Thread {
 		}
 	}
 
+	/**
+	 * The handler class establishes a connection to a new client, requests and receives data from that client, while giving it back the data it needs
+	 */
 	private static class Handler extends Thread {
 		private String name;
 		private Socket socket;
@@ -95,17 +93,10 @@ public class Server extends Thread {
 					if (input == null) {
 						return;
 					}
-					// System.out.println(input);
 					if (input.equals("UPDATEREQUEST")) {
 						out.println(pm.packageData());
-						/*
-						 * for (PrintWriter writer : userwriters) { writer.println("MESSAGE " + name +
-						 * ": " + input); }
-						 */
 					} else if (!input.equals(name)) {
-						// System.out.println(input);
 						pm.pushPacket(name, new Packet(input));
-						// Client sent a packet
 					}
 				}
 			} catch (IOException e) {
