@@ -128,6 +128,7 @@ public class NetworkTestingState extends State {
 		renderer.begin(p.playerCam);
 		entities.forEach(e -> e.render(renderer, world));
 
+		PlayerModel otherPlayer;
 		for (String plyr : Client.pm.data.keySet()) {
 			Color teamColour = Color.GRAY;
 			float x = 0;
@@ -135,7 +136,7 @@ public class NetworkTestingState extends State {
 			float z = 0;
 			float pitch = 0;
 			float yaw = 0;
-			Float ballx = 0f, bally = 0f, ballz = 0f;
+			float ballx = 0f, bally = 0f, ballz = 0f;
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
 					x = Float.parseFloat(p.getData());
@@ -155,13 +156,14 @@ public class NetworkTestingState extends State {
 					bally = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallZ")) {
 					ballz = Float.parseFloat(p.getData());
-					sball = new Ball(ballx, bally, ballz);
+					sball.x = ballx;
+					sball.y = bally;
+					sball.z = ballz;
 					sball.render(renderer, world);
 				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
 			}
-
-			PlayerModel otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
+			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
 			// otherPlayer.model.transform.setTranslation();
 			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float)
@@ -195,6 +197,8 @@ public class NetworkTestingState extends State {
 	@Override
 	public void update(float deltaTime) {
 
+		//System.gc();
+		
 		if (ball != null) {
 
 			ball.update(deltaTime, holdingPitch, holdingYaw, launch);
@@ -237,7 +241,6 @@ public class NetworkTestingState extends State {
 		c.sendPacket(new Packet("YAW:" + p.yaw));
 		c.sendPacket(new Packet("LAUNCH:" + Gdx.input.isTouched()));
 		if (ball != null) {
-
 			c.sendPacket(new Packet("BallX:" + ball.x));
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
