@@ -1,4 +1,3 @@
-
 /**
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
@@ -48,6 +47,7 @@ public class NetworkTestingState extends State {
 	String holdingPlayer = "";
 	float holdingPitch = 0, holdingYaw = 0;
 	boolean launch;
+	boolean isHeld = false;
 	ModelBuilder mb = new ModelBuilder();
 
 	PhysicPlayer p;
@@ -57,7 +57,7 @@ public class NetworkTestingState extends State {
 	Server s;
 
 	boolean isHost = false;
-	
+
 	CullingModelBatch sb;
 
 	Ball sball;
@@ -73,7 +73,7 @@ public class NetworkTestingState extends State {
 		super(stateManager);
 		desiredAddress = address;
 		this.isHost = isHost;
-		
+
 		renderer = new CullingModelBatch();
 		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
 
@@ -120,7 +120,7 @@ public class NetworkTestingState extends State {
 		// TODO Auto-generated method stub
 		c.disconnect();
 		c = null;
-		if(s != null) {
+		if (s != null) {
 			s.stop();
 		}
 		s = null;
@@ -182,6 +182,8 @@ public class NetworkTestingState extends State {
 					launch = Boolean.parseBoolean(p.getData());
 				else if (p.getIdentifier().equals("BallColour"))
 					ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
+				else if (p.getIdentifier().equals("HoldingPlayer"))
+					isHeld = p.getData().equals(System.getProperty("user.name"));
 			}
 			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
@@ -283,6 +285,7 @@ public class NetworkTestingState extends State {
 			c.sendPacket(new Packet("BallY:" + ball.y));
 			c.sendPacket(new Packet("BallZ:" + ball.z));
 			c.sendPacket(new Packet("BallColour:" + ball.colour));
+			c.sendPacket(new Packet("HoldingPlayer:" + holdingPlayer));
 		}
 
 		if (Gdx.input.isTouched()) {
@@ -301,11 +304,12 @@ public class NetworkTestingState extends State {
 
 		if (Gdx.input.isCursorCatched()) {
 			p.rotate(0.3f);
-
-			float cx = (Gdx.input.isKeyPressed(Keys.A) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -4 : 0);
-			float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -4 : 0);
-			float cz = (Gdx.input.isKeyPressed(Keys.W) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -4 : 0);
-			p.localTranslate(cx, cy, cz, deltaTime);
+			if (!isHeld) {
+				float cx = (Gdx.input.isKeyPressed(Keys.A) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.D) ? -4 : 0);
+				float cy = (Gdx.input.isKeyPressed(Keys.SPACE) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.CONTROL_LEFT) ? -4 : 0);
+				float cz = (Gdx.input.isKeyPressed(Keys.W) ? 4 : 0) + (Gdx.input.isKeyPressed(Keys.S) ? -4 : 0);
+				p.localTranslate(cx, cy, cz, deltaTime);
+			}
 		}
 
 		if (p.playerPosition.x < -ARENA_WIDTH / 2)
