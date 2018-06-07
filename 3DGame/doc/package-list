@@ -1,0 +1,6 @@
+com.dcprograming.game.core
+com.dcprograming.game.core.desktop
+com.dcprograming.game.entities
+com.dcprograming.game.managers
+com.dcprograming.game.states
+com.dcprogramming.game.networking

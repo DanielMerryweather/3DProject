@@ -32,7 +32,7 @@ import com.dcprograming.game.core.Core;
 import com.dcprograming.game.entities.Ball;
 import com.dcprograming.game.entities.Entity;
 import com.dcprograming.game.entities.GoalPost;
-import com.dcprograming.game.entities.PhysicPlayer;
+import com.dcprograming.game.entities.Player;
 import com.dcprograming.game.entities.PlayerModel;
 import com.dcprograming.game.entities.Wall;
 import com.dcprograming.game.managers.CullingModelBatch;
@@ -62,7 +62,7 @@ public class NetworkGameState extends State {
 	boolean isHost = false;
 	boolean launch;
 	ModelBuilder mb = new ModelBuilder();
-	PhysicPlayer p;
+	Player p;
 
 	PlayerModel playerModel;
 	int redScore = 0;
@@ -104,7 +104,7 @@ public class NetworkGameState extends State {
 		if (isHost)
 			(s = new Server()).start();
 		c = new Client(desiredAddress);
-		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
+		p = new Player(-10, 0, 0, 110, 0, 0, 1);
 		playerModel = new PlayerModel(0, -10, 0, Color.RED, mb);
 
 		while (!Client.pm.data.containsKey(System.getProperty("user.name")))
