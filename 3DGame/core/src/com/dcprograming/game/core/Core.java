@@ -1,3 +1,11 @@
+
+package com.dcprograming.game.core;
+
+import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
+import com.dcprograming.game.managers.StateManager;
+
 /**
  * Runs a lwjglApplication using libgdx
  * 
@@ -6,13 +14,6 @@
  * @dateCompleted May 24, 2018
  * @version 1.00
  */
-package com.dcprograming.game.core;
-
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.dcprograming.game.managers.StateManager;
-
 public class Core extends ApplicationAdapter {
 
 	private StateManager sm;

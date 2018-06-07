@@ -9,9 +9,10 @@ import java.net.Socket;
 import com.dcprograming.game.managers.PacketManager;
 
 /**
- * @author 50018003 By: Daniel Merryweather The Client class, establishes a
- *         connection to a desired server and recieves all packets in its packet
- *         manager
+ * The Client class, establishes a connection to a desired server and recieves
+ * all packets in its packet manager
+ * 
+ * @author 50018003
  * @dateCreated May 28, 2018
  * @dateCompleted June 6, 2018
  * @version 1.5

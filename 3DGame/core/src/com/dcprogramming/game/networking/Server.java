@@ -11,9 +11,10 @@ import java.util.ArrayList;
 import com.dcprograming.game.managers.PacketManager;
 
 /**
- * @author 50018003 By: Daniel Merryweather The Server class starts up a server
- *         that is able to receive and distribute packets based on its connected
- *         users
+ * The Server class starts up a server that is able to receive and distribute
+ * packets based on its connected users
+ * 
+ * @author 50018003
  * @dateCreated May 28, 2018
  * @dateCompleted June 5, 2018
  * @version 1.3
