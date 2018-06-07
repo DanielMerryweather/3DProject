@@ -9,27 +9,28 @@ import java.net.Socket;
 import com.dcprograming.game.managers.PacketManager;
 
 /**
- * @author 50018003
- * By: Daniel Merryweather
- * The Client class, establishes a connection to a desired server and recieves all packets in its packet manager
+ * @author 50018003 By: Daniel Merryweather The Client class, establishes a
+ *         connection to a desired server and recieves all packets in its packet
+ *         manager
  * @dateCreated May 28, 2018
  * @dateCompleted June 6, 2018
  * @version 1.5
  */
 public class Client {
 
-	static String connectableAddress = "";
-	static Socket socket;
-	static boolean successfullyConnected = false;
-	public static PacketManager pm = new PacketManager("");
+	String connectableAddress = "";
+	public Socket socket;
+	boolean successfullyConnected = false;
+	public PacketManager pm = new PacketManager("");
 
-	static BufferedReader in;
-	static PrintWriter out;
+	BufferedReader in;
+	PrintWriter out;
 
-	static Connection cnct;
+	Connection cnct;
 
 	/**
 	 * Constructor for connecting to a specific server
+	 * 
 	 * @param connectableAddress - String containing an ip
 	 */
 	public Client(String connectableAddress) {
@@ -39,7 +40,10 @@ public class Client {
 	}
 
 	/**
-	 * The connection thread establishes a connection separate from the main application so updates can be done asynchronously, after the connection has been made, basic information such as the username and team are exchanged initally
+	 * The connection thread establishes a connection separate from the main
+	 * application so updates can be done asynchronously, after the connection has
+	 * been made, basic information such as the username and team are exchanged
+	 * initally
 	 */
 	private static class Connection extends Thread {
 
@@ -50,9 +54,9 @@ public class Client {
 			this.c = c;
 			this.name = name;
 			try {
-				socket = new Socket(connectableAddress, 9001);
-				in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				out = new PrintWriter(socket.getOutputStream(), true);
+				c.socket = new Socket(c.connectableAddress, 9001);
+				c.in = new BufferedReader(new InputStreamReader(c.socket.getInputStream()));
+				c.out = new PrintWriter(c.socket.getOutputStream(), true);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -62,18 +66,18 @@ public class Client {
 			while (true) {
 				String line = null;
 				try {
-					line = in.readLine();
+					line = c.in.readLine();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				if (!(line == null)) {
 					if (line.startsWith("USERNAME")) {
-						out.println(name);
+						c.out.println(name);
 					} else if (line.startsWith("USERACCEPTED")) {
-						successfullyConnected = true;
+						c.successfullyConnected = true;
 					} else if (line != null) {
 						System.out.println("Packet Recieved: " + line);
-						pm = new PacketManager(line);
+						c.pm = new PacketManager(line);
 					}
 				}
 			}
@@ -86,10 +90,8 @@ public class Client {
 	 */
 	public void disconnect() {
 		try {
+			socket.close();
 			cnct.stop();
-			if(socket != null) {
-				socket.close();
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -106,6 +108,7 @@ public class Client {
 
 	/**
 	 * Using this connection sends a packet to the server
+	 * 
 	 * @param p - Packet to be sent
 	 */
 	public void sendPacket(Packet p) {

@@ -7,6 +7,7 @@
  */
 package com.dcprograming.game.states;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -107,10 +108,10 @@ public class NetworkGameState extends State {
 		p = new Player(-10, 0, 0, 110, 0, 0, 1);
 		playerModel = new PlayerModel(0, -10, 0, Color.RED, mb);
 
-		while (!Client.pm.data.containsKey(System.getProperty("user.name")))
+		while (!c.pm.data.containsKey(System.getProperty("user.name")))
 			c.serverUpdateRequest();
 
-		Client.pm.data.get(System.getProperty("user.name")).forEach(p -> {
+		c.pm.data.get(System.getProperty("user.name")).forEach(p -> {
 			if (p.getIdentifier().equals("TEAM"))
 				resetPlayerPos(p.getData().equals("RED"));
 		});
@@ -178,6 +179,12 @@ public class NetworkGameState extends State {
 		if (s != null) {
 			s.stop();
 		}
+		try {
+			s.servSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		s = null;
 		System.gc();
 	}
@@ -206,7 +213,7 @@ public class NetworkGameState extends State {
 		c.serverUpdateRequest();
 		PlayerModel otherPlayer;
 		try {
-			for (String plyr : Client.pm.data.keySet()) {
+			for (String plyr : c.pm.data.keySet()) {
 				Color teamColour = Color.GRAY;
 				Color ballColour = Color.GRAY;
 				String teamColourString = "GREY";
@@ -217,7 +224,7 @@ public class NetworkGameState extends State {
 				float yaw = 0;
 				float ballx = 0f, bally = 0f, ballz = 0f;
 
-				for (Packet p : Client.pm.data.get(plyr)) {
+				for (Packet p : c.pm.data.get(plyr)) {
 					if (p.getIdentifier().equals("X")) {
 						x = Float.parseFloat(p.getData());
 					} else if (p.getIdentifier().equals("Y")) {
@@ -301,7 +308,7 @@ public class NetworkGameState extends State {
 	public void update(float deltaTime) {
 
 		if (ball != null) {
-			if (!holdingPlayer.equals("") && !Client.pm.data.keySet().contains(holdingPlayer)) {
+			if (!holdingPlayer.equals("") && !c.pm.data.keySet().contains(holdingPlayer)) {
 				holdingPlayer = "";
 				ball.colour = "GREY";
 			}
@@ -371,10 +378,8 @@ public class NetworkGameState extends State {
 
 		if (Gdx.input.isKeyJustPressed(Keys.ESCAPE)) {
 			if (!Gdx.input.isCursorCatched())
-				if (isHost)
-					Gdx.app.exit();
-				else
-					stateManager.setState(StateManager.MENU);
+
+				stateManager.setState(StateManager.MENU);
 			else
 				Gdx.input.setCursorCatched(false);
 		}

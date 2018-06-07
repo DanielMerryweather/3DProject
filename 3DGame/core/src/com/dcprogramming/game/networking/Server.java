@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import com.dcprograming.game.managers.PacketManager;
 
 /**
- * @author 50018003
- * By: Daniel Merryweather
- * The Server class starts up a server that is able to receive and distribute packets based on its connected users
+ * @author 50018003 By: Daniel Merryweather The Server class starts up a server
+ *         that is able to receive and distribute packets based on its connected
+ *         users
  * @dateCreated May 28, 2018
  * @dateCompleted June 5, 2018
  * @version 1.3
@@ -22,16 +22,17 @@ public class Server extends Thread {
 
 	private static final int PORT = 9001;
 
-	private static ArrayList<String> usernames = new ArrayList<String>();
+	private ArrayList<String> usernames = new ArrayList<String>();
 
-	private static ArrayList<PrintWriter> userwriters = new ArrayList<PrintWriter>();
+	private ArrayList<PrintWriter> userwriters = new ArrayList<PrintWriter>();
 
-	private static PacketManager pm = new PacketManager("");
+	private PacketManager pm = new PacketManager("");
 
-	public static ServerSocket servSocket;
+	public ServerSocket servSocket;
 
 	/**
-	 * The initialization of this server thread, actively tries to accept new connections to the server
+	 * The initialization of this server thread, actively tries to accept new
+	 * connections to the server
 	 */
 	public void run() {
 		System.out.println("Server started on port " + PORT);
@@ -39,7 +40,7 @@ public class Server extends Thread {
 			servSocket = new ServerSocket(PORT);
 			try {
 				while (true) {
-					new Handler(servSocket.accept()).start();
+					new Handler(servSocket.accept(), this).start();
 				}
 			} finally {
 				servSocket.close();
@@ -50,16 +51,19 @@ public class Server extends Thread {
 	}
 
 	/**
-	 * The handler class establishes a connection to a new client, requests and receives data from that client, while giving it back the data it needs
+	 * The handler class establishes a connection to a new client, requests and
+	 * receives data from that client, while giving it back the data it needs
 	 */
 	private static class Handler extends Thread {
 		private String name;
 		private Socket socket;
 		private BufferedReader in;
 		private PrintWriter out;
+		Server s;
 
-		public Handler(Socket socket) {
+		public Handler(Socket socket, Server s) {
 			this.socket = socket;
+			this.s = s;
 		}
 
 		public void run() {
@@ -76,17 +80,17 @@ public class Server extends Thread {
 					if (name == null) {
 						return;
 					}
-					synchronized (usernames) {
-						if (!usernames.contains(name)) {
-							usernames.add(name);
+					synchronized (s.usernames) {
+						if (!s.usernames.contains(name)) {
+							s.usernames.add(name);
 							break;
 						}
 					}
 				}
 
 				out.println("USERACCEPTED");
-				pm.pushPacket(name, new Packet("TEAM:" + (usernames.size()%2==0?"RED":"BLUE")));
-				userwriters.add(out);
+				s.pm.pushPacket(name, new Packet("TEAM:" + (s.usernames.size() % 2 == 0 ? "RED" : "BLUE")));
+				s.userwriters.add(out);
 
 				while (true) {
 					String input = in.readLine();
@@ -94,21 +98,21 @@ public class Server extends Thread {
 						return;
 					}
 					if (input.equals("UPDATEREQUEST")) {
-						out.println(pm.packageData());
+						out.println(s.pm.packageData());
 					} else if (!input.equals(name)) {
-						pm.pushPacket(name, new Packet(input));
+						s.pm.pushPacket(name, new Packet(input));
 					}
 				}
 			} catch (IOException e) {
 				System.out.println(e);
 			} finally {
 				System.out.println("NEW DISCONNECTION!");
-				pm.removeOwner(name);
+				s.pm.removeOwner(name);
 				if (name != null) {
-					usernames.remove(name);
+					s.usernames.remove(name);
 				}
 				if (out != null) {
-					userwriters.remove(out);
+					s.userwriters.remove(out);
 				}
 				try {
 					socket.close();
