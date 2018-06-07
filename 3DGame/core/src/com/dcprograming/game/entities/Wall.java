@@ -1,9 +1,4 @@
-/**
- * @author Colton Giesbrecht
- * @dateCreated May 29, 2018
- * @dateCompleted May 29, 2018
- * @version 1.00
- */
+
 package com.dcprograming.game.entities;
 
 import com.badlogic.gdx.graphics.Color;
@@ -13,6 +8,14 @@ import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 
+/**
+ * Creates and manages a wall model and it's boundingbox
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 29, 2018
+ * @dateCompleted May 29, 2018
+ * @version 1.00
+ */
 public class Wall extends Entity {
 
 	/**

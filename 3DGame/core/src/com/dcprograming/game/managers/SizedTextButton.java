@@ -1,14 +1,16 @@
+
+package com.dcprograming.game.managers;
+
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+
 /**
  * Creates a revised textbutton with manual sizing
+ * 
  * @author Colton Giesbrecht
  * @dateCreated June 4, 2018
  * @dateCompleted June 4, 2018
  * @version 1.00
  */
-package com.dcprograming.game.managers;
-
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-
 public class SizedTextButton extends TextButton {
 
 	private float prefWidth, prefHeight;

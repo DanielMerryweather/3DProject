@@ -1,10 +1,4 @@
-/**
- * Builds a spherical ball entity with a static radius.
- * @author Colton Giesbrecht
- * @dateCreated May 27, 2018
- * @dateCompleted June 4, 2018
- * @version 1.50
- */
+
 package com.dcprograming.game.entities;
 
 import com.badlogic.gdx.graphics.Color;
@@ -17,6 +11,14 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.math.Vector3;
 
+/**
+ * Builds a spherical ball entity with a static radius.
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 27, 2018
+ * @dateCompleted June 4, 2018
+ * @version 1.50
+ */
 public class Ball extends Entity {
 
 	private static final float RADIUS = .3f;

@@ -1,10 +1,4 @@
-/**
- * Creates a modelbatch that culls entities out of the player's frustum.
- * @author Colton Giesbrecht
- * @dateCreated May 23, 2018
- * @dateCompleted May 23, 2018
- * @version 1.00
- */
+
 package com.dcprograming.game.managers;
 
 import java.util.Iterator;
@@ -16,6 +10,14 @@ import com.badlogic.gdx.graphics.g3d.utils.DepthShaderProvider;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.ObjectMap;
 
+/**
+ * Creates a modelbatch that culls entities out of the player's frustum.
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 23, 2018
+ * @dateCompleted May 23, 2018
+ * @version 1.00
+ */
 public class CullingModelBatch extends ModelBatch {
 
 	private ObjectMap<Mesh, Float> radiuses = new ObjectMap<Mesh, Float>();

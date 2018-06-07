@@ -5,9 +5,10 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 
 /**
+ * The Player class handles all the first person player operations, such as
+ * movement and mouse based rotation
+ * 
  * @author 50018003
- * By: Daniel Merryweather
- * The Player class handles all the first person player operations, such as movement and mouse based rotation
  * @dateCreated May 24, 2018
  * @dateCompleted June 5, 2018
  * @version 1.3
@@ -24,6 +25,7 @@ public class Player {
 
 	/**
 	 * Constructor for player initialization
+	 * 
 	 * @param x - X position
 	 * @param y - Y position
 	 * @param z - Z position
@@ -41,28 +43,30 @@ public class Player {
 		playerCam.translate(x, y + height, z);
 		playerCam.lookAt(new Vector3(ilx, ily, ilz));
 		playerCam.update();
-		
+
 	}
 
 	/**
 	 * Rotation based on mouse movement
+	 * 
 	 * @param sens - Mouse sensitivity
 	 */
 	public void rotate(float sens) {
 		playerCam.rotate(Vector3.Y, -sens * Gdx.input.getDeltaX());
 		playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -sens * Gdx.input.getDeltaY());
-		
-		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (playerCam.direction.y > 0 ? 1:-1) / Math.PI * 180 + (playerCam.direction.y > 0 ? 0:180));
+
+		pitch = (float) (Math.acos(Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (playerCam.direction.y > 0 ? 1 : -1) / Math.PI * 180
+				+ (playerCam.direction.y > 0 ? 0 : 180));
 		yaw = (float) (Math.acos(playerCam.up.z / Math.sqrt(playerCam.up.x * playerCam.up.x + playerCam.up.z * playerCam.up.z)) * (-Math.abs(playerCam.up.x) / playerCam.up.x) / Math.PI * 180
 				+ (playerCam.direction.y > 0 ? -180 : 0));
 		if (Float.isNaN(yaw)) {
 			yaw = 0;
 		}
 
-		while(playerCam.up.y < 0) {
-			if(Math.abs(pitch) < 90) {
+		while (playerCam.up.y < 0) {
+			if (Math.abs(pitch) < 90) {
 				playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), 1);
-			}else {
+			} else {
 				playerCam.rotate(playerCam.direction.cpy().crs(Vector3.Y), -1);
 			}
 		}
@@ -71,6 +75,7 @@ public class Player {
 
 	/**
 	 * Sets the position of the player
+	 * 
 	 * @param nx - new X
 	 * @param ny - new Y
 	 * @param nz - new Z
@@ -84,6 +89,7 @@ public class Player {
 
 	/**
 	 * Local translation for the player, relative to current rotation
+	 * 
 	 * @param cx - Change in X
 	 * @param cy - Change in Y
 	 * @param cz - Change in Z

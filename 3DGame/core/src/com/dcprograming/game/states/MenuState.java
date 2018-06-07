@@ -1,10 +1,4 @@
-/**
- * Allows the user to user the gui and it's buttons to host a game, join a game, or quit.
- * @author Colton Giesbrecht
- * @dateCreated May 24, 2018
- * @dateCompleted May 30, 2018
- * @version 1.00
- */
+
 package com.dcprograming.game.states;
 
 import java.net.InetAddress;
@@ -32,6 +26,15 @@ import com.dcprograming.game.managers.SizedTextButton;
 import com.dcprograming.game.managers.SizedTextField;
 import com.dcprograming.game.managers.StateManager;
 
+/**
+ * Allows the user to user the gui and it's buttons to host a game, join a game,
+ * or quit.
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 24, 2018
+ * @dateCompleted May 30, 2018
+ * @version 1.00
+ */
 public class MenuState extends State {
 
 	private SizedTextButton hostButton;

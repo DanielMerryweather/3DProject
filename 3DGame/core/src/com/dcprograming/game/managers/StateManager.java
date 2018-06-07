@@ -1,16 +1,18 @@
-/**
- * Manages the updating, rendering, disposing, and switching of states.
- * @author Colton Giesbrecht
- * @dateCreated May 24, 2018
- * @dateCompleted May 24, 2018
- * @version 1.05
- */
+
 package com.dcprograming.game.managers;
 
 import com.dcprograming.game.states.MenuState;
 import com.dcprograming.game.states.NetworkGameState;
 import com.dcprograming.game.states.State;
 
+/**
+ * Manages the updating, rendering, disposing, and switching of states.
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 24, 2018
+ * @dateCompleted May 24, 2018
+ * @version 1.05
+ */
 public class StateManager {
 
 	public static final int MENU = 1, GAME = 2;

@@ -1,14 +1,16 @@
+
+package com.dcprograming.game.states;
+
+import com.dcprograming.game.managers.StateManager;
+
 /**
  * The abstract framework for any state used by the statemanager
+ * 
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
  * @dateCompleted May 24, 2018
  * @version 1.00
  */
-package com.dcprograming.game.states;
-
-import com.dcprograming.game.managers.StateManager;
-
 public abstract class State {
 
 	protected StateManager stateManager;
