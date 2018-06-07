@@ -1,3 +1,12 @@
+/**
+ * Configures the libGDX lwjglApplication and starts it.
+ * 
+ * @author Colton Giesbrecht
+ * @dateCreated May 23, 2018
+ * @dateCompleted May 23, 2018
+ * @version 1.00
+ */
+
 package com.dcprograming.game.core.desktop;
 
 import java.awt.Toolkit;
@@ -7,6 +16,9 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.dcprograming.game.core.Core;
 
+/**
+ * Configures and starts the lwjglApplication
+ */
 public class DesktopLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();

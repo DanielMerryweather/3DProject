@@ -1,8 +1,9 @@
 /**
+ * Builds a spherical ball entity with a static radius.
  * @author Colton Giesbrecht
  * @dateCreated May 27, 2018
- * @dateCompleted NOT COMPLETED
- * @version 1.00
+ * @dateCompleted June 4, 2018
+ * @version 1.50
  */
 package com.dcprograming.game.entities;
 
@@ -26,7 +27,9 @@ public class Ball extends Entity {
 	float grav = -9.81f;
 
 	/**
-	 * @param model
+	 * Builds a ball model and its bounding box. Sets colour to grey and sets up the
+	 * movement vector.
+	 * 
 	 * @param x
 	 * @param y
 	 * @param z
@@ -40,6 +43,13 @@ public class Ball extends Entity {
 		movement = new Vector3(0, 0, 0);
 	}
 
+	/**
+	 * Translates the ball and it's bounding box.
+	 * 
+	 * @param xc - the change in x
+	 * @param yc - the change in y
+	 * @param zc - the change in z
+	 */
 	private void move(float xc, float yc, float zc) {
 
 		x += xc;
@@ -49,30 +59,29 @@ public class Ball extends Entity {
 
 	}
 
+	/**
+	 * Multiplies the movement vector by the parameter values.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void reflectDir(float x, float y, float z) {
 
 		movement.scl(x, y, z);
 	}
 
+	/**
+	 * Launches the ball in the direction that the player is facing if they are
+	 * holding it and clicking
+	 * 
+	 * @param deltaTime - the time between updates
+	 * @param pitch - the pitch of the player model
+	 * @param yaw - the yaw of the player model
+	 * @param launch - to launch or not
+	 * @param held - is the ball held by a player
+	 */
 	public void update(float deltaTime, float pitch, float yaw, boolean launch, boolean held) {
-
-		// if (heldPlayer < 0)
-		// for (int i = 0; i < players.size(); i++)
-		// if (player.intercept(this)) {
-		// heldPlayer = i;
-		// break;
-		// }
-		// if (heldPlayer >= 0) {
-		// PlayerModel player = players.get(heldPlayer);
-		// // x = (float) (player.x + RADIUS * 0.9f * (float)
-		// // Math.cos(-player.playerRotation.getYaw() / 180 * Math.PI));
-		// y = player.y - player.HEIGHT * 0.3f;
-		// x = player.x;
-		// z = player.z;
-		// model.transform.setTranslation(x, y, z);
-		// changeColor(player.teamColour);
-		// // z = player.z + (float) (player.z + RADIUS * 0.9f *
-		// // Math.sin(-player.playerRotation.getYaw() / 180 * Math.PI));
 
 		if (launch) {
 			System.out.println(pitch + ", " + yaw);
@@ -87,6 +96,11 @@ public class Ball extends Entity {
 		super.update(deltaTime);
 	}
 
+	/**
+	 * changes the ball colour to a new colour
+	 * 
+	 * @param colour
+	 */
 	public void changeColor(Color colour) {
 
 		model.materials.first().set(ColorAttribute.createDiffuse(colour));

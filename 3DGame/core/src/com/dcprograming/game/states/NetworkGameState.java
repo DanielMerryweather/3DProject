@@ -1,5 +1,5 @@
 /**
- * Starts a new quiddich game as a host or as a client. If a host, it operates the ball, goal
+ * Starts a new quidditch game as a host or as a client. If a host, it operates the ball, goal, and score mechanics. Both clients and hosts use their network connection to render any host side physics.
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
  * @dateCompleted June 6, 2018
@@ -86,7 +86,10 @@ public class NetworkGameState extends State {
 	Environment world;
 
 	/**
-	 * @param stateManager
+	 * Sets up server connection, player model, gui, and world map. If isHost is
+	 * true, sets up the ball and starts the server.
+	 * 
+	 * @param stateManager - its managing state manager
 	 */
 	@SuppressWarnings("deprecation")
 	public NetworkGameState(StateManager stateManager, String address, boolean isHost) {
@@ -164,6 +167,9 @@ public class NetworkGameState extends State {
 		teamContainer.setFillParent(true);
 	}
 
+	/**
+	 * Disposes of resources
+	 */
 	@Override
 	public void dispose() {
 
@@ -176,6 +182,10 @@ public class NetworkGameState extends State {
 		System.gc();
 	}
 
+	/**
+	 * Renders all client and server based entities. Also gathers the network
+	 * packets for server reliant rendering.
+	 */
 	@Override
 	public void render() {
 
@@ -279,16 +289,16 @@ public class NetworkGameState extends State {
 		} catch (Exception e) {
 
 		}
-		// playerModel.render(renderer, world);
 		renderer.end();
 		stage.act();
 		stage.draw();
 	}
 
+	/**
+	 * Updates the world, ball, player position, goal, and checks collisions.
+	 */
 	@Override
 	public void update(float deltaTime) {
-
-		// System.gc();
 
 		if (ball != null) {
 			if (!holdingPlayer.equals("") && !Client.pm.data.keySet().contains(holdingPlayer)) {
@@ -397,6 +407,11 @@ public class NetworkGameState extends State {
 		launch = false;
 	}
 
+	/**
+	 * Sets the client player to their default team-based spawn position.
+	 * 
+	 * @param isRed - if player is on the red team
+	 */
 	private void resetPlayerPos(boolean isRed) {
 
 		if (isRed) {

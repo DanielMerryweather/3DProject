@@ -1,7 +1,7 @@
 /**
  * @author Colton Giesbrecht
  * @dateCreated May 29, 2018
- * @dateCompleted NOT COMPLETED
+ * @dateCompleted May 29, 2018
  * @version 1.00
  */
 package com.dcprograming.game.entities;
@@ -12,11 +12,13 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.dcprograming.game.entities.Entity;
 
 public class Wall extends Entity {
 
 	/**
+	 * Creates a wall using a rectangular prism model with y being equal to the
+	 * bottom of the model and x and z being equal to one end
+	 * 
 	 * @param x
 	 * @param y
 	 * @param z

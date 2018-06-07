@@ -1,13 +1,13 @@
 /**
+ * Allows the user to user the gui and it's buttons to host a game, join a game, or quit.
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
- * @dateCompleted NOT COMPLETED
+ * @dateCompleted May 30, 2018
  * @version 1.00
  */
 package com.dcprograming.game.states;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -44,7 +44,12 @@ public class MenuState extends State {
 	private HorizontalGroup joinGameGroup;
 
 	/**
-	 * @param stateManager
+	 * Creates the buttons, the text field, the fonts used, and adds listeners for
+	 * all the buttons so that clicking quit ends the game, join connects to a host
+	 * with the ip in the text field, and host starts and hosts a server.
+	 * 
+	 * @param stateManager - the manager that is running the state. Used for
+	 *            switching states.
 	 */
 	public MenuState(final StateManager stateManager) {
 		super(stateManager);
@@ -80,8 +85,9 @@ public class MenuState extends State {
 				try {
 					InetAddress i = InetAddress.getByName(ipTextField.getText());
 					valid = i.isReachable(100);
-				} catch (Exception e) {}
-				if(valid) {
+				} catch (Exception e) {
+				}
+				if (valid) {
 					stateManager.setState(new NetworkGameState(stateManager, ipTextField.getText(), false));
 				}
 			}
@@ -117,22 +123,30 @@ public class MenuState extends State {
 		stage.addActor(buttonTable);
 	}
 
+	/**
+	 * Renders the stage with the gui.
+	 */
 	@Override
 	public void render() {
-		// TODO Auto-generated method stub
+
 		stage.act();
 		stage.draw();
 	}
 
+	/**
+	 * Abstract implementation and not used in this state.
+	 */
 	@Override
 	public void update(float deltaTime) {
-		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Disposes of the stage once the state is closed
+	 */
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
+
 		stage.dispose();
 	}
 

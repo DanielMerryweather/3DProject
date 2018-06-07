@@ -8,9 +8,9 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 
 /**
- * @author 50018003
- * By: Daniel Merryweather
  * The Player Model class handles the rendered playermodel
+ * 
+ * @author Daniel Merryweather
  * @dateCreated May 24, 2018
  * @dateCompleted June 5, 2018
  * @version 1.0
@@ -23,7 +23,9 @@ public class PlayerModel extends Entity {
 	public Color teamColour;
 
 	/**
-	 * Constructor for a new playermodel with color, position, and the current modelbuilder
+	 * Constructor for a new playermodel with color, position, and the current
+	 * modelbuilder
+	 * 
 	 * @param x - X position
 	 * @param y - Y position
 	 * @param z - Z position

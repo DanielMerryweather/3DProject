@@ -1,7 +1,8 @@
 /**
+ * Creates a modelbatch that culls entities out of the player's frustum.
  * @author Colton Giesbrecht
  * @dateCreated May 23, 2018
- * @dateCompleted NOT COMPLETED
+ * @dateCompleted May 23, 2018
  * @version 1.00
  */
 package com.dcprograming.game.managers;
@@ -22,6 +23,8 @@ public class CullingModelBatch extends ModelBatch {
 	private Vector3 tmp = new Vector3();
 
 	/**
+	 * Provides depthShaderProvider to the modelbatch constructor
+	 * 
 	 * @param depthShaderProvider
 	 */
 	public CullingModelBatch(DepthShaderProvider depthShaderProvider) {
@@ -29,12 +32,16 @@ public class CullingModelBatch extends ModelBatch {
 	}
 
 	/**
-	 * 
+	 * Default empty constructor
 	 */
 	public CullingModelBatch() {
 		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * For each mesh being rendered, check if they are in the player's camera
+	 * frustum and do not render if they are not in view
+	 */
 	@Override
 	public void flush() {
 		Iterator<Renderable> iter = renderables.iterator();
@@ -48,6 +55,12 @@ public class CullingModelBatch extends ModelBatch {
 		super.flush();
 	}
 
+	/**
+	 * Takes a model mesh and returns the radius of the mesh
+	 * 
+	 * @param mesh
+	 * @return radius
+	 */
 	private float getRadiusOfMesh(Mesh mesh) {
 		Float radius = radiuses.get(mesh);
 		if (radius != null) {

@@ -1,8 +1,9 @@
 /**
+ * Manages the updating, rendering, disposing, and switching of states.
  * @author Colton Giesbrecht
  * @dateCreated May 24, 2018
- * @dateCompleted NOT COMPLETED
- * @version 1.00
+ * @dateCompleted May 24, 2018
+ * @version 1.05
  */
 package com.dcprograming.game.managers;
 
@@ -12,14 +13,24 @@ import com.dcprograming.game.states.State;
 
 public class StateManager {
 
-	public static final int MENU = 1, GAME = 2, GAME_OVER = 3, NETWORKTEST = 4;
+	public static final int MENU = 1, GAME = 2;
 
-	public State state;
+	private State state;
 
+	/**
+	 * Sets the starting state
+	 * 
+	 * @param startingState
+	 */
 	public StateManager(int startingState) {
 		setState(startingState);
 	}
 
+	/**
+	 * Sets state based on defined ints corresponding to state types
+	 * 
+	 * @param newState - the new state type
+	 */
 	public void setState(int newState) {
 
 		if (state != null)
@@ -29,30 +40,43 @@ public class StateManager {
 			state = new MenuState(this);
 			break;
 		case GAME:
-			// state = new GameState(this);
-			break;
-		case NETWORKTEST:
 			state = new NetworkGameState(this, "", false);
 			break;
 		}
 	}
 
+	/**
+	 * Sets state based on an existing built state
+	 * 
+	 * @param state - the pre-built state
+	 */
 	public void setState(State state) {
 		if (this.state != null)
 			this.state.dispose();
 		this.state = state;
 	}
 
+	/**
+	 * Updates the current state.
+	 * 
+	 * @param deltaTime - the time between updates
+	 */
 	public void update(float deltaTime) {
 
 		state.update(deltaTime);
 	}
 
+	/**
+	 * Renders the current state
+	 */
 	public void render() {
 
 		state.render();
 	}
 
+	/**
+	 * Clears the resources of the current state
+	 */
 	public void dispose() {
 
 		state.dispose();
