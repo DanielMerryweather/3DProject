@@ -165,7 +165,6 @@ public class NetworkGameState extends State {
 	@Override
 	public void dispose() {
 
-		// TODO Auto-generated method stub
 		c.disconnect();
 		c = null;
 		if (s != null) {
@@ -181,7 +180,7 @@ public class NetworkGameState extends State {
 		sl.begin(p.playerPosition, p.playerCam.direction);
 		sb.begin(sl.getCamera());
 		entities.forEach(e -> e.render(renderer, world));
-		sb.render(playerModel.model, world); // Render players shadow but don't actually show the
+		sb.render(playerModel.model, world);
 		if (sball != null) {
 			sball.render(sb, world);
 		}
@@ -192,7 +191,6 @@ public class NetworkGameState extends State {
 
 		renderer.begin(p.playerCam);
 		entities.forEach(e -> e.render(renderer, world));
-
 		c.serverUpdateRequest();
 		PlayerModel otherPlayer;
 		boolean scoreChange = false;
@@ -401,6 +399,7 @@ public class NetworkGameState extends State {
 			p.playerPosition.set(0, 0, -ARENA_DEPTH / 4);
 		}
 		p.playerCam.position.set(p.playerPosition.x, p.playerPosition.y + 0.75f, p.playerPosition.z);
+		p.playerCam.lookAt(0, 0, 0);
 		p.playerCam.update();
 	}
 
