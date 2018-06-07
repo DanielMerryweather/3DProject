@@ -5,7 +5,7 @@
  * @dateCompleted June 6, 2018
  * @version 3.55
  */
-package com.dcprogramming.game.states;
+package com.dcprograming.game.states;
 
 import java.util.ArrayList;
 
@@ -35,8 +35,8 @@ import com.dcprograming.game.entities.GoalPost;
 import com.dcprograming.game.entities.PhysicPlayer;
 import com.dcprograming.game.entities.PlayerModel;
 import com.dcprograming.game.entities.Wall;
-import com.dcprogramming.game.managers.CullingModelBatch;
-import com.dcprogramming.game.managers.StateManager;
+import com.dcprograming.game.managers.CullingModelBatch;
+import com.dcprograming.game.managers.StateManager;
 import com.dcprogramming.game.networking.Client;
 import com.dcprogramming.game.networking.Packet;
 import com.dcprogramming.game.networking.Server;

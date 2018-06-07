@@ -7,7 +7,7 @@
 package com.dcprograming.game.managers;
 
 import com.dcprograming.game.states.MenuState;
-import com.dcprograming.game.states.NetworkTestingState;
+import com.dcprograming.game.states.NetworkGameState;
 import com.dcprograming.game.states.State;
 
 public class StateManager {
@@ -32,7 +32,7 @@ public class StateManager {
 			// state = new GameState(this);
 			break;
 		case NETWORKTEST:
-			state = new NetworkTestingState(this, "", false);
+			state = new NetworkGameState(this, "", false);
 			break;
 		}
 	}

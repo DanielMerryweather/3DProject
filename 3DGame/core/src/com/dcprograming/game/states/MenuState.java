@@ -68,7 +68,7 @@ public class MenuState extends State {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
 
-				stateManager.setState(new NetworkTestingState(stateManager, "127.0.0.1", true));
+				stateManager.setState(new NetworkGameState(stateManager, "127.0.0.1", true));
 			}
 		});
 		joinButton = new SizedTextButton("Join Game", buttonStyle, Core.pixels * 4, Core.pixels);
@@ -82,7 +82,7 @@ public class MenuState extends State {
 					valid = i.isReachable(100);
 				} catch (Exception e) {}
 				if(valid) {
-					stateManager.setState(new NetworkTestingState(stateManager, ipTextField.getText(), false));
+					stateManager.setState(new NetworkGameState(stateManager, ipTextField.getText(), false));
 				}
 			}
 		});
