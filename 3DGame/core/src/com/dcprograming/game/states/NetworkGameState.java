@@ -101,9 +101,9 @@ public class NetworkGameState extends State {
 		c = new Client(desiredAddress);
 		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
 		playerModel = new PlayerModel(0, -10, 0, Color.RED, mb);
-		c.serverUpdateRequest();
+
 		while (!Client.pm.data.containsKey(System.getProperty("user.name")))
-			;
+			c.serverUpdateRequest();
 
 		Client.pm.data.get(System.getProperty("user.name")).forEach(p -> {
 			if (p.getIdentifier().equals("TEAM"))
@@ -195,6 +195,7 @@ public class NetworkGameState extends State {
 
 		c.serverUpdateRequest();
 		PlayerModel otherPlayer;
+		boolean scoreChange = false;
 		for (String plyr : Client.pm.data.keySet()) {
 			Color teamColour = Color.GRAY;
 			Color ballColour = Color.GRAY;
@@ -205,6 +206,7 @@ public class NetworkGameState extends State {
 			float pitch = 0;
 			float yaw = 0;
 			float ballx = 0f, bally = 0f, ballz = 0f;
+
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
 					x = Float.parseFloat(p.getData());
@@ -235,10 +237,10 @@ public class NetworkGameState extends State {
 					isHeld = p.getData().equals(System.getProperty("user.name"));
 				else if (p.getIdentifier().equals("BlueScore") && !p.getData().equals(blueScoreLabel.getText().toString())) {
 					blueScoreLabel.setText(p.getData());
-					resetPlayerPos(teamColourString.equals("RED"));
+					scoreChange = true;
 				} else if (p.getIdentifier().equals("RedScore") && !p.getData().equals(redScoreLabel.getText().toString())) {
 					redScoreLabel.setText(p.getData());
-					resetPlayerPos(teamColourString.equals("RED"));
+					scoreChange = true;
 				}
 			}
 			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
@@ -252,6 +254,8 @@ public class NetworkGameState extends State {
 			} else {
 				teamLabel.setStyle(teamColourString.equals("RED") ? redScoreStyle : blueScoreStyle);
 				teamLabel.setText(teamColourString.equals("RED") ? "Red Team" : "Blue Team");
+				if (scoreChange)
+					resetPlayerPos(teamColourString.equals("RED"));
 			}
 
 			if (ball != null && holdingPlayer.equals("") && otherPlayer.intercept(ball)) {
