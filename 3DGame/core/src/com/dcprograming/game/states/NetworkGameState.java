@@ -96,7 +96,8 @@ public class NetworkGameState extends State {
 		renderer = new CullingModelBatch();
 
 		System.out.println(address);
-		if (isHost) (s = new Server()).start();
+		if (isHost)
+			(s = new Server()).start();
 		c = new Client(desiredAddress);
 		p = new PhysicPlayer(-10, 0, 0, 110, 0, 0, 1);
 		playerModel = new PlayerModel(0, -10, 0, Color.RED, mb);
@@ -105,7 +106,8 @@ public class NetworkGameState extends State {
 			;
 
 		Client.pm.data.get(System.getProperty("user.name")).forEach(p -> {
-			if (p.getIdentifier().equals("TEAM")) resetPlayerPos(p.getData().equals("RED"));
+			if (p.getIdentifier().equals("TEAM"))
+				resetPlayerPos(p.getData().equals("RED"));
 		});
 		c.sendPacket(new Packet("X:" + p.playerPosition.x));
 		c.sendPacket(new Packet("Y:" + p.playerPosition.y));
@@ -126,7 +128,8 @@ public class NetworkGameState extends State {
 		}
 		world = new Environment();
 		world.set(new ColorAttribute(ColorAttribute.AmbientLight, 0.4f, 0.4f, 0.4f, 1));
-		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f, 100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
+		world.add((sl = new DirectionalShadowLight((int) (Gdx.graphics.getWidth() * 1.2f), (int) (Gdx.graphics.getHeight() * 1.2f), Gdx.graphics.getWidth() / 100, Gdx.graphics.getHeight() / 100, 0f,
+				100f)).set(1f, 1f, 1f, new Vector3(-1f, -1f, -1f)));
 		world.shadowMap = sl;
 		entities.add(new Wall(-ARENA_WIDTH / 2, -0.2f, -ARENA_DEPTH / 2, ARENA_WIDTH, 0.2f, ARENA_DEPTH, Color.GREEN));
 		sb = new CullingModelBatch(new DepthShaderProvider());
@@ -205,24 +208,18 @@ public class NetworkGameState extends State {
 			for (Packet p : Client.pm.data.get(plyr)) {
 				if (p.getIdentifier().equals("X")) {
 					x = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("Y")) {
+				} else if (p.getIdentifier().equals("Y")) {
 					y = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("Z")) {
+				} else if (p.getIdentifier().equals("Z")) {
 					z = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("PITCH")) {
+				} else if (p.getIdentifier().equals("PITCH")) {
 					pitch = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("YAW")) {
+				} else if (p.getIdentifier().equals("YAW")) {
 					yaw = Float.parseFloat(p.getData());
-				}
-				else if (p.getIdentifier().equals("TEAM")) {
+				} else if (p.getIdentifier().equals("TEAM")) {
 					teamColourString = p.getData();
 					teamColour = teamColourString.equals("RED") ? Color.RED : Color.BLUE;
-				}
-				else if (p.getIdentifier().equals("BallX"))
+				} else if (p.getIdentifier().equals("BallX"))
 					ballx = Float.parseFloat(p.getData());
 				else if (p.getIdentifier().equals("BallY"))
 					bally = Float.parseFloat(p.getData());
@@ -230,31 +227,29 @@ public class NetworkGameState extends State {
 					ballz = Float.parseFloat(p.getData());
 					sball = new Ball(ballx, bally, ballz);
 					sball.render(renderer, world);
-				}
-				else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
+				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
 					launch = Boolean.parseBoolean(p.getData());
 				else if (p.getIdentifier().equals("BallColour"))
 					ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
 				else if (p.getIdentifier().equals("HoldingPlayer"))
 					isHeld = p.getData().equals(System.getProperty("user.name"));
-				else if (p.getIdentifier().equals("BlueScore"))
+				else if (p.getIdentifier().equals("BlueScore") && !p.getData().equals(blueScoreLabel.getText().toString())) {
 					blueScoreLabel.setText(p.getData());
-				else if (p.getIdentifier().equals("RedScore")) redScoreLabel.setText(p.getData());
+					resetPlayerPos(teamColourString.equals("RED"));
+				} else if (p.getIdentifier().equals("RedScore") && !p.getData().equals(redScoreLabel.getText().toString())) {
+					redScoreLabel.setText(p.getData());
+					resetPlayerPos(teamColourString.equals("RED"));
+				}
 			}
 			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
 			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
-			// otherPlayer.model.transform.setTranslation();
-			// otherPlayer.model.transform.setFromEulerAnglesRad(-yaw / 180f * (float)
-			// Math.PI,
-			// -pitch / 180f * (float) Math.PI, 0);
 			otherPlayer.x = x;
 			otherPlayer.y = y;
 			otherPlayer.z = z;
 			otherPlayer.update(Gdx.graphics.getDeltaTime());
 			if (!plyr.equals(System.getProperty("user.name"))) {
 				otherPlayer.render(renderer, world);
-			}
-			else {
+			} else {
 				teamLabel.setStyle(teamColourString.equals("RED") ? redScoreStyle : blueScoreStyle);
 				teamLabel.setText(teamColourString.equals("RED") ? "Red Team" : "Blue Team");
 			}
@@ -272,7 +267,8 @@ public class NetworkGameState extends State {
 				this.ball.z = otherPlayer.z;
 				// System.out.println(ball.x);
 			}
-			if (sball != null) sball.changeColor(ballColour);
+			if (sball != null)
+				sball.changeColor(ballColour);
 		}
 
 		// playerModel.render(renderer, world);
@@ -300,7 +296,8 @@ public class NetworkGameState extends State {
 				ball.z = 0;
 				if (ball.colour.equals("RED"))
 					redScore++;
-				else blueScore++;
+				else
+					blueScore++;
 				// System.out.println(redScore + " " + blueScore);
 				ball.colour = "GREY";
 			}
@@ -314,24 +311,21 @@ public class NetworkGameState extends State {
 			if (ball.x < -ARENA_WIDTH / 2) {
 				ball.x = -ARENA_WIDTH / 2;
 				ball.reflectDir(-0.8F, 0.8F, 0.8F);
-			}
-			else if (ball.x > ARENA_WIDTH / 2) {
+			} else if (ball.x > ARENA_WIDTH / 2) {
 				ball.x = ARENA_WIDTH / 2;
 				ball.reflectDir(-0.8F, 0.8F, 0.8F);
 			}
 			if (ball.y < 0) {
 				ball.y = 0;
 				ball.reflectDir(0.8F, -0.8F, 0.8F);
-			}
-			else if (ball.y > ARENA_HEIGHT) {
+			} else if (ball.y > ARENA_HEIGHT) {
 				ball.y = ARENA_HEIGHT;
 				ball.reflectDir(0.8F, -0.8F, 0.8F);
 			}
 			if (ball.z < -ARENA_DEPTH / 2) {
 				ball.reflectDir(0.8F, 0.8F, -0.8F);
 				ball.z = -ARENA_DEPTH / 2;
-			}
-			else if (ball.z > ARENA_DEPTH / 2) {
+			} else if (ball.z > ARENA_DEPTH / 2) {
 				ball.reflectDir(0.8F, 0.8F, -0.8F);
 				ball.z = ARENA_DEPTH / 2;
 			}
@@ -361,8 +355,10 @@ public class NetworkGameState extends State {
 			if (!Gdx.input.isCursorCatched())
 				if (isHost)
 					Gdx.app.exit();
-				else stateManager.setState(StateManager.MENU);
-			else Gdx.input.setCursorCatched(false);
+				else
+					stateManager.setState(StateManager.MENU);
+			else
+				Gdx.input.setCursorCatched(false);
 		}
 
 		if (Gdx.input.isCursorCatched()) {
@@ -377,15 +373,19 @@ public class NetworkGameState extends State {
 
 		if (p.playerPosition.x < -ARENA_WIDTH / 2)
 			p.setPosition(-ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
-		else if (p.playerPosition.x > ARENA_WIDTH / 2) p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
+		else if (p.playerPosition.x > ARENA_WIDTH / 2)
+			p.setPosition(ARENA_WIDTH / 2 - p.playerPosition.x, 0, 0);
 		if (p.playerPosition.y < 0)
 			p.setPosition(0, -p.playerPosition.y, 0);
-		else if (p.playerPosition.y > ARENA_HEIGHT) p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
+		else if (p.playerPosition.y > ARENA_HEIGHT)
+			p.setPosition(0, ARENA_HEIGHT - p.playerPosition.y, 0);
 		if (p.playerPosition.z < -ARENA_DEPTH / 2)
 			p.setPosition(0, 0, -ARENA_DEPTH / 2 - p.playerPosition.z);
-		else if (p.playerPosition.z > ARENA_DEPTH / 2) p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
+		else if (p.playerPosition.z > ARENA_DEPTH / 2)
+			p.setPosition(0, 0, ARENA_DEPTH / 2 - p.playerPosition.z);
 
-		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0, 1, 0)), new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
+		playerModel.model.transform.set(p.playerPosition.cpy().add(new Vector3(0, 1, 0)),
+				new Quaternion().setEulerAngles(-p.playerCam.view.getRotation(new Quaternion()).getYaw(), -p.playerCam.view.getRotation(new Quaternion()).getPitch(), 0));
 		launch = false;
 	}
 
@@ -393,10 +393,11 @@ public class NetworkGameState extends State {
 
 		if (isRed) {
 			p.playerPosition.set(0, 0, ARENA_DEPTH / 4);
+		} else {
+			p.playerPosition.set(0, 0, -ARENA_DEPTH / 4);
 		}
-		else {
-			p.setPosition(0, 0, -ARENA_DEPTH / 4);
-		}
+		p.playerCam.position.set(p.playerPosition.x, p.playerPosition.y + 0.75f, p.playerPosition.z);
+		p.playerCam.update();
 	}
 
 }
