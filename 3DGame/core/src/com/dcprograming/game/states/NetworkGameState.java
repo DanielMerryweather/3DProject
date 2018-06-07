@@ -78,6 +78,8 @@ public class NetworkGameState extends State {
 
 	DirectionalShadowLight sl;
 
+	boolean scoreChange = false;
+
 	Stage stage;
 	Label teamLabel;
 
@@ -193,86 +195,90 @@ public class NetworkGameState extends State {
 		entities.forEach(e -> e.render(renderer, world));
 		c.serverUpdateRequest();
 		PlayerModel otherPlayer;
-		boolean scoreChange = false;
-		for (String plyr : Client.pm.data.keySet()) {
-			Color teamColour = Color.GRAY;
-			Color ballColour = Color.GRAY;
-			String teamColourString = "GREY";
-			float x = 0;
-			float y = -10;
-			float z = 0;
-			float pitch = 0;
-			float yaw = 0;
-			float ballx = 0f, bally = 0f, ballz = 0f;
+		try {
+			for (String plyr : Client.pm.data.keySet()) {
+				Color teamColour = Color.GRAY;
+				Color ballColour = Color.GRAY;
+				String teamColourString = "GREY";
+				float x = 0;
+				float y = -10;
+				float z = 0;
+				float pitch = 0;
+				float yaw = 0;
+				float ballx = 0f, bally = 0f, ballz = 0f;
 
-			for (Packet p : Client.pm.data.get(plyr)) {
-				if (p.getIdentifier().equals("X")) {
-					x = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("Y")) {
-					y = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("Z")) {
-					z = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("PITCH")) {
-					pitch = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("YAW")) {
-					yaw = Float.parseFloat(p.getData());
-				} else if (p.getIdentifier().equals("TEAM")) {
-					teamColourString = p.getData();
-					teamColour = teamColourString.equals("RED") ? Color.RED : Color.BLUE;
-				} else if (p.getIdentifier().equals("BallX"))
-					ballx = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("BallY"))
-					bally = Float.parseFloat(p.getData());
-				else if (p.getIdentifier().equals("BallZ")) {
-					ballz = Float.parseFloat(p.getData());
-					sball = new Ball(ballx, bally, ballz);
-					sball.render(renderer, world);
-				} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
-					launch = Boolean.parseBoolean(p.getData());
-				else if (p.getIdentifier().equals("BallColour"))
-					ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
-				else if (p.getIdentifier().equals("HoldingPlayer"))
-					isHeld = p.getData().equals(System.getProperty("user.name"));
-				else if (p.getIdentifier().equals("BlueScore") && !p.getData().equals(blueScoreLabel.getText().toString())) {
-					blueScoreLabel.setText(p.getData());
-					scoreChange = true;
-				} else if (p.getIdentifier().equals("RedScore") && !p.getData().equals(redScoreLabel.getText().toString())) {
-					redScoreLabel.setText(p.getData());
-					scoreChange = true;
+				for (Packet p : Client.pm.data.get(plyr)) {
+					if (p.getIdentifier().equals("X")) {
+						x = Float.parseFloat(p.getData());
+					} else if (p.getIdentifier().equals("Y")) {
+						y = Float.parseFloat(p.getData());
+					} else if (p.getIdentifier().equals("Z")) {
+						z = Float.parseFloat(p.getData());
+					} else if (p.getIdentifier().equals("PITCH")) {
+						pitch = Float.parseFloat(p.getData());
+					} else if (p.getIdentifier().equals("YAW")) {
+						yaw = Float.parseFloat(p.getData());
+					} else if (p.getIdentifier().equals("TEAM")) {
+						teamColourString = p.getData();
+						teamColour = teamColourString.equals("RED") ? Color.RED : Color.BLUE;
+					} else if (p.getIdentifier().equals("BallX"))
+						ballx = Float.parseFloat(p.getData());
+					else if (p.getIdentifier().equals("BallY"))
+						bally = Float.parseFloat(p.getData());
+					else if (p.getIdentifier().equals("BallZ")) {
+						ballz = Float.parseFloat(p.getData());
+						sball = new Ball(ballx, bally, ballz);
+						sball.render(renderer, world);
+					} else if (p.getIdentifier().equals("LAUNCH") && holdingPlayer.equals(plyr))
+						launch = Boolean.parseBoolean(p.getData());
+					else if (p.getIdentifier().equals("BallColour"))
+						ballColour = p.getData().equals("BLUE") ? Color.BLUE : p.getData().equals("RED") ? Color.RED : Color.GRAY;
+					else if (p.getIdentifier().equals("HoldingPlayer"))
+						isHeld = p.getData().equals(System.getProperty("user.name"));
+					else if (p.getIdentifier().equals("BlueScore") && !p.getData().equals(blueScoreLabel.getText().toString())) {
+						blueScoreLabel.setText(p.getData());
+						scoreChange = true;
+					} else if (p.getIdentifier().equals("RedScore") && !p.getData().equals(redScoreLabel.getText().toString())) {
+						redScoreLabel.setText(p.getData());
+						scoreChange = true;
+					}
 				}
-			}
-			otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
-			otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
-			otherPlayer.x = x;
-			otherPlayer.y = y;
-			otherPlayer.z = z;
-			otherPlayer.update(Gdx.graphics.getDeltaTime());
-			if (!plyr.equals(System.getProperty("user.name"))) {
-				otherPlayer.render(renderer, world);
-			} else {
-				teamLabel.setStyle(teamColourString.equals("RED") ? redScoreStyle : blueScoreStyle);
-				teamLabel.setText(teamColourString.equals("RED") ? "Red Team" : "Blue Team");
-				if (scoreChange)
-					resetPlayerPos(teamColourString.equals("RED"));
-			}
+				otherPlayer = new PlayerModel(0, -10, 0, teamColour, mb);
+				otherPlayer.model.transform.set(new Vector3(x, y + 1, z), new Quaternion().setEulerAnglesRad(-yaw / 180f * (float) Math.PI, -pitch / 180f * (float) Math.PI, 0));
+				otherPlayer.x = x;
+				otherPlayer.y = y;
+				otherPlayer.z = z;
+				otherPlayer.update(Gdx.graphics.getDeltaTime());
+				if (!plyr.equals(System.getProperty("user.name"))) {
+					otherPlayer.render(renderer, world);
+				} else {
+					teamLabel.setStyle(teamColourString.equals("RED") ? redScoreStyle : blueScoreStyle);
+					teamLabel.setText(teamColourString.equals("RED") ? "Red Team" : "Blue Team");
+					if (scoreChange) {
+						resetPlayerPos(teamColourString.equals("RED"));
+						scoreChange = false;
+					}
+				}
 
-			if (ball != null && holdingPlayer.equals("") && otherPlayer.intercept(ball)) {
-				// System.out.println("Hi");
-				holdingPlayer = plyr;
-				ball.colour = teamColourString;
+				if (ball != null && holdingPlayer.equals("") && otherPlayer.intercept(ball)) {
+					// System.out.println("Hi");
+					holdingPlayer = plyr;
+					ball.colour = teamColourString;
+				}
+				if (holdingPlayer.equals(plyr)) {
+					holdingPitch = pitch;
+					holdingYaw = yaw;
+					this.ball.x = otherPlayer.x;
+					this.ball.y = otherPlayer.y;
+					this.ball.z = otherPlayer.z;
+					// System.out.println(ball.x);
+				}
+				if (sball != null)
+					sball.changeColor(ballColour);
 			}
-			if (holdingPlayer.equals(plyr)) {
-				holdingPitch = pitch;
-				holdingYaw = yaw;
-				this.ball.x = otherPlayer.x;
-				this.ball.y = otherPlayer.y;
-				this.ball.z = otherPlayer.z;
-				// System.out.println(ball.x);
-			}
-			if (sball != null)
-				sball.changeColor(ballColour);
+		} catch (Exception e) {
+
 		}
-
 		// playerModel.render(renderer, world);
 		renderer.end();
 		stage.act();
@@ -399,7 +405,6 @@ public class NetworkGameState extends State {
 			p.playerPosition.set(0, 0, -ARENA_DEPTH / 4);
 		}
 		p.playerCam.position.set(p.playerPosition.x, p.playerPosition.y + 0.75f, p.playerPosition.z);
-		p.playerCam.lookAt(0, 0, 0);
 		p.playerCam.update();
 	}
 
